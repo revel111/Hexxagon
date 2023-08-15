@@ -4,15 +4,11 @@
 
 class Button {
 public:
-    Button(const std::string &text);
-
-    auto setFont(const sf::Font &font) -> void;
-
-    auto setBackColor(const sf::Color &color) -> void;
-
-    auto setTextColor(const sf::Color &color) -> void;
+    Button(const std::string &text, const sf::Vector2f &size, const int &charSize, const sf::Color &back);
 
     auto setPosition(const sf::Vector2f &pos) -> void;
+
+    auto setText(const std::string &text) -> void;
 
     auto drawBut(sf::RenderWindow &window) -> void;
 
@@ -25,4 +21,10 @@ public:
 private:
     sf::RectangleShape button;
     sf::Text text;
+
+    auto setBackColor(const sf::Color &color) -> void;
+
+    auto setTextColor(const sf::Color &color) -> void;
+
+    auto setFont(const sf::Font &font) -> void;
 };

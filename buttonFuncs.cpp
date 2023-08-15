@@ -1,11 +1,11 @@
 #include "buttonFuncs.h"
 
-Button::Button(const std::string &text) {
+Button::Button(const std::string &text, const sf::Vector2f &size, const int &charSize, const sf::Color &back) {
     this->text.setString(text);
     this->text.setFillColor(sf::Color::White);
-    this->text.setCharacterSize(20);
-    button.setSize({125, 65});
-    button.setFillColor(sf::Color(128, 128, 128));
+    this->text.setCharacterSize(charSize);
+    button.setSize(size);
+    button.setFillColor(back);
 }
 
 auto Button::setFont(const sf::Font &font) -> void {
@@ -29,6 +29,10 @@ auto Button::setPosition(const sf::Vector2f &pos) -> void {
     text.setPosition(xPos, yPos);
 }
 
+auto Button::setText(const std::string &text) -> void {
+    this->text.setString(text);
+}
+
 auto Button::drawBut(sf::RenderWindow &window) -> void {
     window.draw(button);
     window.draw(text);
@@ -50,14 +54,9 @@ auto Button::isMouseOver(sf::RenderWindow &window) -> bool {
     return false;
 }
 
-auto Button::initializeBut(/*std::vector<Button>*/Button &button, const sf::Vector2f &pos, const sf::Font &font) -> void {
-//    auto font = sf::Font{};
-//    font.loadFromFile("CALISTB.ttf");
-//    for (Button button : buttons) {
-        button.setPosition(pos);
-        button.setFont(font);
-//        pos.x += 300;
-//    }
+auto Button::initializeBut(Button &button, const sf::Vector2f &pos, const sf::Font &font) -> void {
+    button.setPosition(pos);
+    button.setFont(font);
 }
 
 auto Button::colorBut(Button &button, sf::RenderWindow &window) -> void {
