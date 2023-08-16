@@ -57,9 +57,9 @@ build CMakeFiles/Hexxagon.dir/main.cpp.obj: CXX_COMPILER__Hexxagon_Debug G$:/Cod
   OBJECT_DIR = CMakeFiles\Hexxagon.dir
   OBJECT_FILE_DIR = CMakeFiles\Hexxagon.dir
 
-build CMakeFiles/Hexxagon.dir/buttonFuncs.cpp.obj: CXX_COMPILER__Hexxagon_Debug G$:/Coding/finished/sharaga/C++/projectsClion/Hexxagon/buttonFuncs.cpp || cmake_object_order_depends_target_Hexxagon
+build CMakeFiles/Hexxagon.dir/butMenu.cpp.obj: CXX_COMPILER__Hexxagon_Debug G$:/Coding/finished/sharaga/C++/projectsClion/Hexxagon/butMenu.cpp || cmake_object_order_depends_target_Hexxagon
   DEFINES = -DSFML_BUILD_STATIC -DSFML_STATIC
-  DEP_FILE = CMakeFiles\Hexxagon.dir\buttonFuncs.cpp.obj.d
+  DEP_FILE = CMakeFiles\Hexxagon.dir\butMenu.cpp.obj.d
   FLAGS = -g -fdiagnostics-color=always -std=gnu++20
   INCLUDES = -IG:/Coding/finished/sharaga/C++/projectsClion/Hexxagon/cmake-build-debug/_deps/sfml-src/include
   OBJECT_DIR = CMakeFiles\Hexxagon.dir
@@ -81,7 +81,7 @@ build CMakeFiles/Hexxagon.dir/map.cpp.obj: CXX_COMPILER__Hexxagon_Debug G$:/Codi
 #############################################
 # Link the executable Hexxagon.exe
 
-build Hexxagon.exe: CXX_EXECUTABLE_LINKER__Hexxagon_Debug CMakeFiles/Hexxagon.dir/main.cpp.obj CMakeFiles/Hexxagon.dir/buttonFuncs.cpp.obj CMakeFiles/Hexxagon.dir/map.cpp.obj | _deps/sfml-build/lib/libsfml-graphics-s-d.a _deps/sfml-build/lib/libsfml-audio-s-d.a _deps/sfml-build/lib/libsfml-network-s-d.a _deps/sfml-build/lib/libsfml-window-s-d.a _deps/sfml-build/lib/libsfml-system-s-d.a _deps/sfml-src/extlibs/libs-mingw/x64/libfreetype.a _deps/sfml-src/extlibs/libs-mingw/x64/libopenal32.a _deps/sfml-src/extlibs/libs-mingw/x64/libvorbisenc.a _deps/sfml-src/extlibs/libs-mingw/x64/libvorbisfile.a _deps/sfml-src/extlibs/libs-mingw/x64/libvorbis.a _deps/sfml-src/extlibs/libs-mingw/x64/libogg.a _deps/sfml-src/extlibs/libs-mingw/x64/libFLAC.a || _deps/sfml-build/lib/libsfml-audio-s-d.a _deps/sfml-build/lib/libsfml-graphics-s-d.a _deps/sfml-build/lib/libsfml-network-s-d.a _deps/sfml-build/lib/libsfml-system-s-d.a _deps/sfml-build/lib/libsfml-window-s-d.a
+build Hexxagon.exe: CXX_EXECUTABLE_LINKER__Hexxagon_Debug CMakeFiles/Hexxagon.dir/main.cpp.obj CMakeFiles/Hexxagon.dir/butMenu.cpp.obj CMakeFiles/Hexxagon.dir/map.cpp.obj | _deps/sfml-build/lib/libsfml-graphics-s-d.a _deps/sfml-build/lib/libsfml-audio-s-d.a _deps/sfml-build/lib/libsfml-network-s-d.a _deps/sfml-build/lib/libsfml-window-s-d.a _deps/sfml-build/lib/libsfml-system-s-d.a _deps/sfml-src/extlibs/libs-mingw/x64/libfreetype.a _deps/sfml-src/extlibs/libs-mingw/x64/libopenal32.a _deps/sfml-src/extlibs/libs-mingw/x64/libvorbisenc.a _deps/sfml-src/extlibs/libs-mingw/x64/libvorbisfile.a _deps/sfml-src/extlibs/libs-mingw/x64/libvorbis.a _deps/sfml-src/extlibs/libs-mingw/x64/libogg.a _deps/sfml-src/extlibs/libs-mingw/x64/libFLAC.a || _deps/sfml-build/lib/libsfml-audio-s-d.a _deps/sfml-build/lib/libsfml-graphics-s-d.a _deps/sfml-build/lib/libsfml-network-s-d.a _deps/sfml-build/lib/libsfml-system-s-d.a _deps/sfml-build/lib/libsfml-window-s-d.a
   FLAGS = -g
   LINK_LIBRARIES = _deps/sfml-build/lib/libsfml-graphics-s-d.a  _deps/sfml-build/lib/libsfml-audio-s-d.a  _deps/sfml-build/lib/libsfml-network-s-d.a  _deps/sfml-build/lib/libsfml-window-s-d.a  _deps/sfml-build/lib/libsfml-system-s-d.a  -lgdi32  -lopengl32  -lglu32  _deps/sfml-src/extlibs/libs-mingw/x64/libfreetype.a  _deps/sfml-src/extlibs/libs-mingw/x64/libopenal32.a  _deps/sfml-src/extlibs/libs-mingw/x64/libvorbisenc.a  _deps/sfml-src/extlibs/libs-mingw/x64/libvorbisfile.a  _deps/sfml-src/extlibs/libs-mingw/x64/libvorbis.a  _deps/sfml-src/extlibs/libs-mingw/x64/libogg.a  _deps/sfml-src/extlibs/libs-mingw/x64/libFLAC.a  -lwinmm  -lws2_32  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\Hexxagon.dir

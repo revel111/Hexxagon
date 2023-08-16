@@ -1,13 +1,37 @@
 #pragma once
 
-#include "buttonFuncs.h"
+#include "butMenu.h"
 #include <vector>
+#include <memory>
+#include <valarray>
 
 
-class Map /*: public sf::Drawable, public sf::Transformable*/ {
+class Map {
 public:
-    static auto draw(sf::RenderWindow &window, const sf::Font &font) -> void;
+    auto initializeMap(sf::RenderWindow &window, const sf::Font &font) -> void;
+
+    auto drawMap(sf::RenderWindow &window) -> void;
+
+    auto makeMove(sf::RenderWindow &window) -> void;
 
 private:
-    static std::vector<std::vector<int>> map;
+    std::vector<std::vector<int>> mapInt = {{3},
+                                            {1, 1},
+                                            {1, 1, 1},
+                                            {1, 1, 1, 1},
+                                            {2, 1, 1, 1, 2},
+                                            {1, 1, 1, 1},
+                                            {1, 1, 0, 1, 1},
+                                            {1, 1, 1, 1},
+                                            {1, 1, 1, 1, 1},
+                                            {1, 0, 0, 1},
+                                            {1, 1, 1, 1, 1},
+                                            {1, 1, 1, 1},
+                                            {3, 1, 1, 1, 3},
+                                            {1, 1, 1, 1},
+                                            {1, 1, 1},
+                                            {1, 1},
+                                            {2}
+    };
+    std::vector<std::vector<std::unique_ptr<ButtonMenu>>> mapBut;
 };
