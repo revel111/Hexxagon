@@ -1,5 +1,5 @@
 #include "butMenu.h"
-#include "map.h"
+#include "game.h"
 
 enum class GameState {
     inMainMenu,
@@ -14,7 +14,6 @@ int main() {
     auto window = sf::RenderWindow(sf::VideoMode(1200, 800), "Hexxagon");
     auto font = sf::Font{};
     auto icon = sf::Image{};
-    auto mode = true;
     auto first = true;
 
     icon.loadFromFile("icon.jpg");
@@ -38,7 +37,7 @@ int main() {
     backgroundIm.loadFromFile("backgroundMenu.jpg");
     auto background = sf::Sprite(backgroundIm);
 
-    auto map = Map();
+    auto map = Game(true);
 
     while (window.isOpen()) {
         auto event = sf::Event{};
@@ -72,10 +71,10 @@ int main() {
                         currentState = GameState::inHighScores;
                     else if (computerVsPlayer.isMouseOver(window) && currentState == GameState::inMode) {
                         currentState = GameState::inGame;
-                        map = Map();
+                        map = Game(true);
                     } else if (playerVsPlayer.isMouseOver(window) && currentState == GameState::inMode) {
                         currentState = GameState::inGame;
-                        mode = false;
+                        map = Game(false);
                     } else if (currentState == GameState::inGame)
                         map.makeMove(window);
                     break;

@@ -1,4 +1,5 @@
 #include "butMenu.h"
+#include "game.h"
 
 ButtonMenu::ButtonMenu(const std::string &text, const sf::Vector2f &size, const int &charSize, const sf::Color &back) {
     this->text.setString(text);
@@ -8,20 +9,20 @@ ButtonMenu::ButtonMenu(const std::string &text, const sf::Vector2f &size, const 
     button.setFillColor(back);
 }
 
+sf::Text &ButtonMenu::getText() {
+    return text;
+}
+
+sf::RectangleShape &ButtonMenu::getButton() {
+    return button;
+}
+
+sf::Color &ButtonMenu::getDefColor()  {
+    return defColor;
+}
+
 void ButtonMenu::setDefColor(const sf::Color &defColor) {
     ButtonMenu::defColor = defColor;
-}
-
-auto ButtonMenu::setFont(const sf::Font &font) -> void {
-    text.setFont(font);
-}
-
-auto ButtonMenu::setBackColor(const sf::Color &color) -> void {
-    button.setFillColor(color);
-}
-
-auto ButtonMenu::setTextColor(const sf::Color &color) -> void {
-    text.setFillColor(color);
 }
 
 auto ButtonMenu::setPosition(const sf::Vector2f &pos) -> void {
@@ -31,10 +32,6 @@ auto ButtonMenu::setPosition(const sf::Vector2f &pos) -> void {
     auto yPos = (pos.y + button.getGlobalBounds().height / 3) - (text.getGlobalBounds().height / 3);
 
     text.setPosition(xPos, yPos);
-}
-
-auto ButtonMenu::setText(const std::string &text) -> void {
-    this->text.setString(text);
 }
 
 auto ButtonMenu::drawBut(sf::RenderWindow &window) -> void {
@@ -60,22 +57,24 @@ auto ButtonMenu::isMouseOver(sf::RenderWindow &window) -> bool {
 
 auto ButtonMenu::initializeBut(const sf::Vector2f &pos, const sf::Font &font) -> void {
     this->setPosition(pos);
-    this->setFont(font);
+    this->getText().setFont(font);
 }
 
 auto ButtonMenu::colorButMenu(sf::RenderWindow &window) -> void {
     if (this->isMouseOver(window)) {
-        this->setBackColor(sf::Color::White);
-        this->setTextColor(sf::Color(128, 128, 128));
+        this->getButton().setFillColor(sf::Color::White);
+        this->getText().setFillColor(sf::Color(128, 128, 128));
     } else {
-        this->setBackColor(sf::Color(128, 128, 128));
-        this->setTextColor(sf::Color::White);
+        this->getButton().setFillColor(sf::Color(128, 128, 128));
+        this->getText().setFillColor(sf::Color::White);
     }
 }
 
-auto ButtonMenu::colorButGame(sf::RenderWindow &window) -> void {
-    if (this->isMouseOver(window))
-        this->setTextColor(sf::Color::Green);
+auto ButtonMenu::colorButGame(sf::RenderWindow &window, bool &turn) -> void {
+    if (this->isMouseOver(window) && (this->text.getString() == "1" || this->text.getString() == "2"))
+        this->getText().setFillColor(sf::Color::Green);
+//    else if (this->isMouseOver(window) && Game::checkSelected())
+//        this->getText().setString("")
     else
-        this->setTextColor(defColor);
+        this->getText().setFillColor(defColor);
 }
