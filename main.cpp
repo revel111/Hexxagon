@@ -14,12 +14,18 @@ int main() {
     auto window = sf::RenderWindow(sf::VideoMode(1200, 800), "Hexxagon");
     auto font = sf::Font{};
     auto icon = sf::Image{};
+    auto clock = sf::Clock{};
+    auto timer = sf::seconds(0);
     auto first = true;
 
     icon.loadFromFile("icon.jpg");
     font.loadFromFile("CALISTB.ttf");
 
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+
+    auto timerText = sf::Text("", font, 20);
+    timerText.setPosition(1100, 500);
+    timerText.setFillColor(sf::Color::White);
 
     auto newGame = ButtonMenu("New Game", {125, 65}, 20, sf::Color(128, 128, 128));
     auto highScores = ButtonMenu("High Scores", {125, 65}, 20, sf::Color(128, 128, 128));
@@ -37,7 +43,7 @@ int main() {
     backgroundIm.loadFromFile("backgroundMenu.jpg");
     auto background = sf::Sprite(backgroundIm);
 
-    auto map = Game(true);
+    auto game = Game(true);
 
     while (window.isOpen()) {
         auto event = sf::Event{};
@@ -71,13 +77,18 @@ int main() {
                         currentState = GameState::inHighScores;
                     else if (computerVsPlayer.isMouseOver(window) && currentState == GameState::inMode) {
                         currentState = GameState::inGame;
-                        map = Game(true);
+                        game = Game(true);
                     } else if (playerVsPlayer.isMouseOver(window) && currentState == GameState::inMode) {
                         currentState = GameState::inGame;
-                        map = Game(false);
+                        game = Game(false);
                     } else if (currentState == GameState::inGame)
-                        map.makeMove(window);
+                        game.makeMove(window);
                     break;
+                case sf::Event::KeyPressed:
+                    if (currentState == GameState::inGame && event.key.code == sf::Keyboard::Escape) {
+                        currentState = GameState::inMainMenu;
+                        first = true;
+                    }
             }
 //            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
 //                if (currentState == GameState::inMainMenu)
@@ -85,6 +96,11 @@ int main() {
 //                else
 //                    currentState = GameState::inMainMenu;
         }
+
+        sf::Time elapsedTime = clock.restart();
+        timer += elapsedTime;
+
+        timerText.setString(std::to_string(timer.asSeconds()));
 
         window.clear();
 
@@ -105,10 +121,14 @@ int main() {
                 break;
             case GameState::inGame:
                 if (first) {
-                    map.initializeMap(window, font);
+                    game.initializeMap(window, font);
                     first = false;
-                } else
-                    map.drawMap(window);
+                    timer = sf::seconds(0);
+                    clock.restart();
+                } else {
+                    game.drawMap(window);
+                    window.draw(timerText);
+                }
                 break;
         }
 

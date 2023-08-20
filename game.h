@@ -5,7 +5,6 @@
 #include <memory>
 #include <valarray>
 
-
 class Game {
 public:
     Game(bool mode);
@@ -20,7 +19,11 @@ public:
 
     auto checkSelected() -> bool;
 
-    auto colorButGame(sf::RenderWindow &window, std::unique_ptr<ButtonMenu> &button) -> void;
+    auto disableSelected() -> void;
+
+    auto colorButGame(sf::RenderWindow &window, std::unique_ptr<ButtonMenu> &button, int x, int y) -> void;
+
+    auto checkMove(std::unique_ptr<ButtonMenu> &button, int x, int y) -> bool;
 
 private:
     std::vector<std::vector<int>> mapInt = {{3},

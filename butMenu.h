@@ -24,8 +24,6 @@ public:
 
     auto colorButMenu(sf::RenderWindow &window) -> void;
 
-    auto colorButGame(sf::RenderWindow &window, bool &turn) -> void;
-
 private:
     sf::RectangleShape button;
     sf::Text text;

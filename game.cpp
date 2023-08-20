@@ -2,7 +2,7 @@
 
 Game::Game(bool mode) {
     this->mode = mode;
-    turn = true;
+    turn = false;
     you = 0;
     enemy = 0;
 }
@@ -36,7 +36,7 @@ auto Game::initializeMap(sf::RenderWindow &window, const sf::Font &font) -> void
         }
 
         for (auto j = 0; j < mapInt[i].size(); j++) {
-            auto button = std::make_unique<ButtonMenu>("", sf::Vector2f(50, 15), 15, sf::Color::Black);
+            auto button = std::make_unique<ButtonMenu>("", sf::Vector2f(50, 25), 15, sf::Color::Black);
             switch (mapInt[i][j]) {
                 case 0:
                     button->getText().setString("X");
@@ -74,9 +74,9 @@ auto Game::drawMap(sf::RenderWindow &window) -> void {
 }
 
 auto Game::makeMove(sf::RenderWindow &window) -> void {
-    for (auto &i: mapBut)
-        for (auto &j: i)
-            colorButGame(window, j);
+    for (auto i = 0; i < mapBut.size(); i++)
+        for (auto j = 0; j < mapBut[i].size(); j++)
+            colorButGame(window, mapBut[i][j], j, i);
 }
 
 auto Game::checkEnd() -> bool {
@@ -97,24 +97,48 @@ auto Game::checkSelected() -> bool {
     return false;
 }
 
-auto Game::colorButGame(sf::RenderWindow &window, std::unique_ptr<ButtonMenu> &button) -> void {
-    if (button->isMouseOver(window) && Game::checkSelected())
+auto Game::disableSelected() -> void {
+    for (auto &i: mapBut)
+        for (const auto &j: i)
+            if (j->getText().getFillColor() == sf::Color::Green)
+                j->getText().setFillColor(j->getDefColor());
+}
+
+auto Game::colorButGame(sf::RenderWindow &window, std::unique_ptr<ButtonMenu> &button, int x, int y) -> void {
+    if (checkSelected() && button->isMouseOver(window)) {
         if (button->getText().getFillColor() == sf::Color::Green)
             button->getText().setFillColor(button->getDefColor());
-        else if (turn) {
-            button->getText().setString("2");
-            turn = false;
-        } else {
-            button->getText().setString("1");
-            turn = true;
+        else if (checkMove(button, x, y)) {
+            if (turn) {
+                button->getText().setString("2");
+                button->getText().setFillColor(sf::Color::Cyan);
+                button->setDefColor(sf::Color::Cyan);
+                turn = false;
+            } else {
+                button->getText().setString("1");
+                button->getText().setFillColor(sf::Color::Blue);
+                button->setDefColor(sf::Color::Blue);
+                turn = true;
+            }
+            disableSelected();
         }
-    else if (button->isMouseOver(window)) {
-        if (turn && button->getText().getString() == "2")
+    } else if (button->isMouseOver(window))
+        if ((turn && button->getText().getString() == "2") || (!turn && button->getText().getString() == "1"))
             button->getText().setFillColor(sf::Color::Green);
-        else if (!turn && button->getText().getString() == "1")
-            button->getText().setFillColor(sf::Color::Green);
-        else
-            button->getText().setFillColor(button->getDefColor());
-    } else
-        button->getText().setFillColor(button->getDefColor());
+}
+
+auto Game::checkMove(std::unique_ptr<ButtonMenu> &button, int x, int y) -> bool {
+    auto selectedX = 0, selectedY = 0;
+
+    for (auto i = 0; i < mapBut.size(); i++)
+        for (auto j = 0; j < mapBut[i].size(); j++)
+            if (mapBut[i][j]->getText().getFillColor() == sf::Color::Green)
+                selectedX = j, selectedY = i;
+
+    if (button->getText().getString() != "X" && button->getText().getString() != "1" &&
+        button->getText().getString() != "2" &&
+        ((selectedX - x <= 2) && (selectedY - y <= 2)))
+        return true;
+
+    return false;
 }

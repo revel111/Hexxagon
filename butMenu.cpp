@@ -1,5 +1,4 @@
 #include "butMenu.h"
-#include "game.h"
 
 ButtonMenu::ButtonMenu(const std::string &text, const sf::Vector2f &size, const int &charSize, const sf::Color &back) {
     this->text.setString(text);
@@ -22,7 +21,7 @@ sf::Color &ButtonMenu::getDefColor()  {
 }
 
 void ButtonMenu::setDefColor(const sf::Color &defColor) {
-    ButtonMenu::defColor = defColor;
+   this->defColor = defColor;
 }
 
 auto ButtonMenu::setPosition(const sf::Vector2f &pos) -> void {
@@ -68,13 +67,4 @@ auto ButtonMenu::colorButMenu(sf::RenderWindow &window) -> void {
         this->getButton().setFillColor(sf::Color(128, 128, 128));
         this->getText().setFillColor(sf::Color::White);
     }
-}
-
-auto ButtonMenu::colorButGame(sf::RenderWindow &window, bool &turn) -> void {
-    if (this->isMouseOver(window) && (this->text.getString() == "1" || this->text.getString() == "2"))
-        this->getText().setFillColor(sf::Color::Green);
-//    else if (this->isMouseOver(window) && Game::checkSelected())
-//        this->getText().setString("")
-    else
-        this->getText().setFillColor(defColor);
 }
