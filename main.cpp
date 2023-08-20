@@ -8,7 +8,7 @@ enum class GameState {
     inHighScores
 };
 
-int main() {
+auto main() -> int {
     GameState currentState = GameState::inMainMenu;
 
     auto window = sf::RenderWindow(sf::VideoMode(1200, 800), "Hexxagon");
@@ -24,8 +24,16 @@ int main() {
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
     auto timerText = sf::Text("", font, 20);
-    timerText.setPosition(1100, 500);
+    timerText.setPosition(1090, 510);
     timerText.setFillColor(sf::Color::White);
+
+    auto you = ButtonMenu("0", {50, 50}, 20, sf::Color::Blue);
+    auto enemy = ButtonMenu("0", {50, 50}, 20, sf::Color::Cyan);
+
+    you.initializeBut({1100, 550}, font);
+    enemy.initializeBut({1100, 600}, font);
+    you.getText().setFillColor(sf::Color::Black);
+    enemy.getText().setFillColor(sf::Color::Black);
 
     auto newGame = ButtonMenu("New Game", {125, 65}, 20, sf::Color(128, 128, 128));
     auto highScores = ButtonMenu("High Scores", {125, 65}, 20, sf::Color(128, 128, 128));
@@ -101,6 +109,8 @@ int main() {
         timer += elapsedTime;
 
         timerText.setString(std::to_string(timer.asSeconds()));
+        you.getText().setString(game.counter(true));
+        enemy.getText().setString(game.counter(false));
 
         window.clear();
 
@@ -128,6 +138,8 @@ int main() {
                 } else {
                     game.drawMap(window);
                     window.draw(timerText);
+                    you.drawBut(window);
+                    enemy.drawBut(window);
                 }
                 break;
         }

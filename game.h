@@ -19,12 +19,11 @@ public:
 
     auto checkSelected() -> bool;
 
-    auto disableSelected() -> void;
-
     auto colorButGame(sf::RenderWindow &window, std::unique_ptr<ButtonMenu> &button, int x, int y) -> void;
 
-    auto checkMove(std::unique_ptr<ButtonMenu> &button, int x, int y) -> bool;
+    auto checkMove(std::unique_ptr<ButtonMenu> &button, int x, int y) -> void ;
 
+    auto counter(bool ch) -> std::string;
 private:
     std::vector<std::vector<int>> mapInt = {{3},
                                             {1, 1},
