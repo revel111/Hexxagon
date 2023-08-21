@@ -17,35 +17,33 @@ auto main() -> int {
     auto clock = sf::Clock{};
     auto timer = sf::seconds(0);
     auto first = true;
+    auto timerText = sf::Text("", font, 20);
 
     icon.loadFromFile("icon.jpg");
     font.loadFromFile("CALISTB.ttf");
 
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
-    auto timerText = sf::Text("", font, 20);
     timerText.setPosition(1090, 510);
     timerText.setFillColor(sf::Color::White);
-
-    auto you = ButtonMenu("0", {50, 50}, 20, sf::Color::Blue);
-    auto enemy = ButtonMenu("0", {50, 50}, 20, sf::Color::Cyan);
-
-    you.initializeBut({1100, 550}, font);
-    enemy.initializeBut({1100, 600}, font);
-    you.getText().setFillColor(sf::Color::Black);
-    enemy.getText().setFillColor(sf::Color::Black);
 
     auto newGame = ButtonMenu("New Game", {125, 65}, 20, sf::Color(128, 128, 128));
     auto highScores = ButtonMenu("High Scores", {125, 65}, 20, sf::Color(128, 128, 128));
     auto exit = ButtonMenu("Exit", {125, 65}, 20, sf::Color(128, 128, 128));
     auto computerVsPlayer = ButtonMenu("Computer vs Player", {225, 65}, 20, sf::Color(128, 128, 128));
     auto playerVsPlayer = ButtonMenu("Player vs Player", {225, 65}, 20, sf::Color(128, 128, 128));
+    auto you = ButtonMenu("0", {50, 50}, 20, sf::Color::Blue);
+    auto enemy = ButtonMenu("0", {50, 50}, 20, sf::Color::Cyan);
 
     newGame.initializeBut({300, 300}, font);
     highScores.initializeBut({600, 300}, font);
     exit.initializeBut({900, 300}, font);
     computerVsPlayer.initializeBut({300, 300}, font);
     playerVsPlayer.initializeBut({750, 300}, font);
+    you.initializeBut({1100, 550}, font);
+    enemy.initializeBut({1100, 600}, font);
+    you.getText().setFillColor(sf::Color::Black);
+    enemy.getText().setFillColor(sf::Color::Black);
 
     auto backgroundIm = sf::Texture{};
     backgroundIm.loadFromFile("backgroundMenu.jpg");
@@ -55,7 +53,7 @@ auto main() -> int {
 
     while (window.isOpen()) {
         auto event = sf::Event{};
-        while (window.pollEvent(event)) {
+        while (window.pollEvent(event))
             switch (event.type) {
                 case sf::Event::MouseMoved:
                     switch (currentState) {
@@ -98,12 +96,6 @@ auto main() -> int {
                         first = true;
                     }
             }
-//            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Space)
-//                if (currentState == GameState::inMainMenu)
-//                    currentState = GameState::inGame;
-//                else
-//                    currentState = GameState::inMainMenu;
-        }
 
         sf::Time elapsedTime = clock.restart();
         timer += elapsedTime;

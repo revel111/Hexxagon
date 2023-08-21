@@ -84,6 +84,9 @@ auto Game::checkEnd() -> bool {
         for (const auto &j: i)
             if (j->getText().getString() == "O")
                 return false;
+            else if (j->getText().getString() == "1" || j->getText().getString() == "2") {
+
+            }
 
     return true;
 }
@@ -98,7 +101,7 @@ auto Game::checkSelected() -> bool {
 }
 
 auto Game::colorButGame(sf::RenderWindow &window, std::unique_ptr<ButtonMenu> &button, int x, int y) -> void {
-    if (checkSelected() && button->isMouseOver(window))
+    if (button->isMouseOver(window) && checkSelected())
         if (button->getText().getFillColor() == sf::Color::Green)
             button->getText().setFillColor(button->getDefColor());
         else
@@ -118,12 +121,52 @@ auto Game::checkMove(std::unique_ptr<ButtonMenu> &button, int x, int y) -> void 
                 mapBut[selectedY][selectedX]->getText().setFillColor(mapBut[selectedY][selectedX]->getDefColor());
             }
 
-    if (button->getText().getString() != "X" && button->getText().getString() != "1" &&
-        button->getText().getString() != "2" && ((abs(selectedX - x) <= 2) && (abs(selectedY - y) <= 4))) {
+    if (button->getText().getString() == "O" && ((abs(selectedX - x) <= 2) && (abs(selectedY - y) <= 4))) {
         if ((abs(selectedX - x) == 2) || ((abs(selectedY - y)) == 4) || ((abs(selectedY - y)) == 3)) {
-            mapBut[selectedY][selectedX]->getText().setString("0");
+            mapBut[selectedY][selectedX]->getText().setString("O");
             mapBut[selectedY][selectedX]->setDefColor(sf::Color::White);
             mapBut[selectedY][selectedX]->getText().setFillColor(sf::Color::White);
+        }
+
+        std::vector<std::vector<int>> offsetEnemy = {
+                {-2, 0},
+                {-1, -1},
+                {-1, 0},
+                {-1, 1},
+                {0,  -1},
+                {1,  -1},
+                {0,  1},
+                {1,  0},
+                {1,  1},
+                {2,  0}
+        };
+
+        for (const auto &offset: offsetEnemy) {
+            auto newY = y + offset[0];
+            auto newX = x + offset[1];
+
+            if (mapBut[newY].size() == 5) {
+                if ((offset[0] == 1 && offset[1] == -1) ||
+                    (offset[0] == -1 && offset[1] == -1)) {
+                    continue;
+                }
+            } else if (mapBut[newY].size() == 4)
+                if ((offset[0] == -1 && offset[1] == 1) ||
+                    (offset[0] == 1 && offset[1] == 1)) {
+                    continue;
+                }
+
+            if (newX >= 0 && newY < mapBut.size() && newY >= 0 && newX < mapBut[newY].size()) {
+                if (mapBut[newY][newX]->getText().getString() == "2" && !turn) {
+                    mapBut[newY][newX]->getText().setString("1");
+                    mapBut[newY][newX]->setDefColor(sf::Color::Blue);
+                    mapBut[newY][newX]->getText().setFillColor(sf::Color::Blue);
+                } else if (mapBut[newY][newX]->getText().getString() == "1" && turn) {
+                    mapBut[newY][newX]->getText().setString("2");
+                    mapBut[newY][newX]->setDefColor(sf::Color::Cyan);
+                    mapBut[newY][newX]->getText().setFillColor(sf::Color::Cyan);
+                }
+            }
         }
 
         if (turn) {
