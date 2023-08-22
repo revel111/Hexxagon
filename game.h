@@ -1,8 +1,9 @@
 #pragma once
 
-#include "butMenu.h"
+#include "button.h"
 #include <vector>
 #include <memory>
+#include <sstream>
 #include <valarray>
 
 class Game {
@@ -19,11 +20,12 @@ public:
 
     auto checkSelected() -> bool;
 
-    auto colorButGame(sf::RenderWindow &window, std::unique_ptr<ButtonMenu> &button, int x, int y) -> void;
+    auto colorButGame(sf::RenderWindow &window, std::unique_ptr<Button> &button, int x, int y) -> void;
 
-    auto checkMove(std::unique_ptr<ButtonMenu> &button, int x, int y) -> void ;
+    auto checkMove(std::unique_ptr<Button> &button, int x, int y) -> void;
 
-    auto counter(bool ch) -> std::string;
+    auto counter(int ch) -> std::string;
+
 private:
     std::vector<std::vector<int>> mapInt = {{3},
                                             {1, 1},
@@ -43,10 +45,14 @@ private:
                                             {1, 1},
                                             {2}
     };
+/*    std::vector<std::vector<int>> mapInt = {{3},
+                                            {1, 1},
+                                            {1, 1, 1},
+                                            {1, 1, 1, 1},
+                                            {2, 1, 1, 1, 2},
+    };*/
 
-    int you;
-    int enemy;
     bool mode;
     bool turn;
-    std::vector<std::vector<std::unique_ptr<ButtonMenu>>> mapBut;
+    std::vector<std::vector<std::unique_ptr<Button>>> mapBut;
 };

@@ -1,6 +1,6 @@
-#include "butMenu.h"
+#include "button.h"
 
-ButtonMenu::ButtonMenu(const std::string &text, const sf::Vector2f &size, const int &charSize, const sf::Color &back) {
+Button::Button(const std::string &text, const sf::Vector2f &size, const int &charSize, const sf::Color &back) {
     this->text.setString(text);
     this->text.setFillColor(sf::Color::White);
     this->text.setCharacterSize(charSize);
@@ -8,37 +8,37 @@ ButtonMenu::ButtonMenu(const std::string &text, const sf::Vector2f &size, const 
     button.setFillColor(back);
 }
 
-sf::Text &ButtonMenu::getText() {
+sf::Text &Button::getText() {
     return text;
 }
 
-sf::RectangleShape &ButtonMenu::getButton() {
+sf::RectangleShape &Button::getButton() {
     return button;
 }
 
-sf::Color &ButtonMenu::getDefColor()  {
+sf::Color &Button::getDefColor() {
     return defColor;
 }
 
-void ButtonMenu::setDefColor(const sf::Color &defColor) {
-   this->defColor = defColor;
+void Button::setDefColor(const sf::Color &defColor) {
+    this->defColor = defColor;
 }
 
-auto ButtonMenu::setPosition(const sf::Vector2f &pos) -> void {
+auto Button::setPosition(const sf::Vector2f &pos, float width, float height) -> void {
     button.setPosition(pos);
 
-    auto xPos = (pos.x + button.getGlobalBounds().width / 7) - (text.getGlobalBounds().width / 3);
-    auto yPos = (pos.y + button.getGlobalBounds().height / 3) - (text.getGlobalBounds().height / 3);
+    auto xPos = (pos.x + button.getGlobalBounds().width / width) - (text.getGlobalBounds().width / width);
+    auto yPos = (pos.y + button.getGlobalBounds().height / height) - (text.getGlobalBounds().height / height);
 
     text.setPosition(xPos, yPos);
 }
 
-auto ButtonMenu::drawBut(sf::RenderWindow &window) -> void {
+auto Button::drawBut(sf::RenderWindow &window) -> void {
     window.draw(button);
     window.draw(text);
 }
 
-auto ButtonMenu::isMouseOver(sf::RenderWindow &window) -> bool {
+auto Button::isMouseOver(sf::RenderWindow &window) -> bool {
     auto xMouse = sf::Mouse::getPosition(window).x;
     auto yMouse = sf::Mouse::getPosition(window).y;
 
@@ -54,12 +54,12 @@ auto ButtonMenu::isMouseOver(sf::RenderWindow &window) -> bool {
     return false;
 }
 
-auto ButtonMenu::initializeBut(const sf::Vector2f &pos, const sf::Font &font) -> void {
-    this->setPosition(pos);
+auto Button::initializeBut(const sf::Vector2f &pos, const sf::Font &font, float width, float height) -> void {
+    this->setPosition(pos, width, height);
     this->getText().setFont(font);
 }
 
-auto ButtonMenu::colorButMenu(sf::RenderWindow &window) -> void {
+auto Button::colorButMenu(sf::RenderWindow &window) -> void {
     if (this->isMouseOver(window)) {
         this->getButton().setFillColor(sf::Color::White);
         this->getText().setFillColor(sf::Color(128, 128, 128));

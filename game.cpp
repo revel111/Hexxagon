@@ -3,8 +3,6 @@
 Game::Game(bool mode) {
     this->mode = mode;
     turn = false;
-    you = 0;
-    enemy = 0;
 }
 
 auto Game::initializeMap(sf::RenderWindow &window, const sf::Font &font) -> void {
@@ -36,7 +34,7 @@ auto Game::initializeMap(sf::RenderWindow &window, const sf::Font &font) -> void
         }
 
         for (auto j = 0; j < mapInt[i].size(); j++) {
-            auto button = std::make_unique<ButtonMenu>("", sf::Vector2f(50, 25), 15, sf::Color::Black);
+            auto button = std::make_unique<Button>("", sf::Vector2f(30, 30), 15, sf::Color::Black);
             switch (mapInt[i][j]) {
                 case 0:
                     button->getText().setString("X");
@@ -60,7 +58,7 @@ auto Game::initializeMap(sf::RenderWindow &window, const sf::Font &font) -> void
             }
             sf::Vector2f pos = {currentStartX + j * (50 * 1.5f),
                                 static_cast<float>(startY + i * (std::sqrt(3.0f) * 25) + 1)};
-            button->initializeBut(pos, font);
+            button->initializeBut(pos, font, 4, 4);
             mapBut[i].push_back(std::move(button));
             mapBut[i][j]->drawBut(window);
         }
@@ -80,15 +78,62 @@ auto Game::makeMove(sf::RenderWindow &window) -> void {
 }
 
 auto Game::checkEnd() -> bool {
-    for (auto &i: mapBut)
-        for (const auto &j: i)
-            if (j->getText().getString() == "O")
+    std::vector<std::vector<int>> offsetEnemy = {
+/*            {-2, 0},*/
+            {-1, -1},
+            {-1, 0},
+            {-1, 1},
+            {0,  -1},
+            {1,  -1},
+            {0,  1},
+            {1,  0},
+            {1,  1},
+            /*{2,  0}*/
+    };
+
+    /*auto totalCounter = 0;
+    for (auto i = 0; i < mapBut.size(); i++)
+        for (auto j = 0; j < mapBut[i].size(); j++)
+            if (mapBut[i][j]->getText().getString() == "O")
                 return false;
-            else if (j->getText().getString() == "1" || j->getText().getString() == "2") {
+            else if (mapBut[i][j]->getText().getString() == "1" || mapBut[i][j]->getText().getString() == "2") {
+                auto offsetCounter = 0;
+                for (const auto &offset: offsetEnemy) {
+                    auto newY = i + offset[0];
+                    auto newX = j + offset[1];
 
-            }
+                    if (mapBut[newY].size() == 5) {
+                        if ((offset[0] == 1 && offset[1] == -1) ||
+                            (offset[0] == -1 && offset[1] == -1)) {
+                            offsetCounter++;
+                            continue;
+                        }
+                    } else if (mapBut[newY].size() == 4)
+                        if ((offset[0] == -1 && offset[1] == 1) ||
+                            (offset[0] == 1 && offset[1] == 1)) {
+                            offsetCounter++;
+                            continue;
+                        }
 
-    return true;
+                    if (newX >= 0 && newY < mapBut.size() && newY >= 0 && newX < mapBut[newY].size()) {
+                        if (mapBut[newY][newX]->getText().getString() == "2" ||
+                            mapBut[newY][newX]->getText().getString() == "1") {
+                            offsetCounter++;
+                        }
+                    } else
+                        totalCounter++;
+
+                }
+                if (offsetCounter == offsetEnemy.size())
+                    totalCounter++;
+                else
+                    return false;
+            }*/
+
+    if (/*totalCounter == mapBut.size() ||*/ counter(1) == "0" || counter(2) == "0" || counter(3) == "0")
+        return true;
+
+    return false;
 }
 
 auto Game::checkSelected() -> bool {
@@ -100,7 +145,7 @@ auto Game::checkSelected() -> bool {
     return false;
 }
 
-auto Game::colorButGame(sf::RenderWindow &window, std::unique_ptr<ButtonMenu> &button, int x, int y) -> void {
+auto Game::colorButGame(sf::RenderWindow &window, std::unique_ptr<Button> &button, int x, int y) -> void {
     if (button->isMouseOver(window) && checkSelected())
         if (button->getText().getFillColor() == sf::Color::Green)
             button->getText().setFillColor(button->getDefColor());
@@ -111,7 +156,7 @@ auto Game::colorButGame(sf::RenderWindow &window, std::unique_ptr<ButtonMenu> &b
             button->getText().setFillColor(sf::Color::Green);
 }
 
-auto Game::checkMove(std::unique_ptr<ButtonMenu> &button, int x, int y) -> void {
+auto Game::checkMove(std::unique_ptr<Button> &button, int x, int y) -> void {
     auto selectedX = 0, selectedY = 0;
 
     for (auto i = 0; i < mapBut.size(); i++)
@@ -129,7 +174,7 @@ auto Game::checkMove(std::unique_ptr<ButtonMenu> &button, int x, int y) -> void 
         }
 
         std::vector<std::vector<int>> offsetEnemy = {
-                {-2, 0},
+                /*            {-2, 0},*/
                 {-1, -1},
                 {-1, 0},
                 {-1, 1},
@@ -138,7 +183,7 @@ auto Game::checkMove(std::unique_ptr<ButtonMenu> &button, int x, int y) -> void 
                 {0,  1},
                 {1,  0},
                 {1,  1},
-                {2,  0}
+                /*{2,  0}*/
         };
 
         for (const auto &offset: offsetEnemy) {
@@ -150,7 +195,7 @@ auto Game::checkMove(std::unique_ptr<ButtonMenu> &button, int x, int y) -> void 
                     (offset[0] == -1 && offset[1] == -1)) {
                     continue;
                 }
-            } else if (mapBut[newY].size() == 4)
+            } else if (mapBut[newY].size() <= 4)
                 if ((offset[0] == -1 && offset[1] == 1) ||
                     (offset[0] == 1 && offset[1] == 1)) {
                     continue;
@@ -183,11 +228,12 @@ auto Game::checkMove(std::unique_ptr<ButtonMenu> &button, int x, int y) -> void 
     }
 }
 
-auto Game::counter(bool ch) -> std::string {
+auto Game::counter(int ch) -> std::string {
     auto count = 0;
     for (auto &i: mapBut)
         for (const auto &j: i)
-            if ((j->getText().getString() == "1" && ch) || (j->getText().getString() == "2" && !ch))
+            if ((j->getText().getString() == "1" && ch == 1) || (j->getText().getString() == "2" && ch == 2) ||
+                (j->getText().getString() == "O" && ch == 3))
                 count++;
 
     return std::to_string(count);
