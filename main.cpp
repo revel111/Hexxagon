@@ -18,6 +18,9 @@ auto main() -> int {
     auto timer = sf::seconds(0);
     auto first = true;
     auto timerText = sf::Text("", font, 20);
+    auto score = sf::Text("", font);
+
+    score.setPosition(450, 250);
 
     icon.loadFromFile("icon.jpg");
     font.loadFromFile("CALISTB.ttf");
@@ -39,8 +42,8 @@ auto main() -> int {
     newGame.initializeBut({300, 300}, font, 10, 3);
     highScores.initializeBut({600, 300}, font, 10, 3);
     exit.initializeBut({900, 300}, font, 3, 3);
-    computerVsPlayer.initializeBut({300, 300}, font, 10, 3);
-    playerVsPlayer.initializeBut({750, 300}, font, 6, 3);
+    playerVsPlayer.initializeBut({300, 300}, font, 6, 3);
+    computerVsPlayer.initializeBut({750, 300}, font, 10, 3);
     player1.initializeBut({1100, 550}, font, 3, 4);
     player2.initializeBut({1100, 600}, font, 3, 4);
     player1.getText().setFillColor(sf::Color::Black);
@@ -97,6 +100,8 @@ auto main() -> int {
                     if ((currentState == GameState::inGame || currentState == GameState::inMode ||
                          currentState == GameState::inHighScores) &&
                         event.key.code == sf::Keyboard::Escape) {
+                        if (currentState == GameState::inGame)
+                            game.saveInFile(stoi(game.counter(1)), stoi(game.counter(2)));
                         currentState = GameState::inMainMenu;
                         first = true;
                     }
@@ -117,7 +122,9 @@ auto main() -> int {
                 computerVsPlayer.drawBut(window);
                 break;
             case GameState::inHighScores:
-
+                window.draw(background);
+                score.setString(Game::readFile());
+                window.draw(score);
                 break;
             case GameState::inGame:
                 if (first) {

@@ -132,7 +132,6 @@ auto Game::checkEnd() -> bool {
 
     if (/*totalCounter == mapBut.size() ||*/ counter(1) == "0" || counter(2) == "0" || counter(3) == "0")
         return true;
-
     return false;
 }
 
@@ -146,14 +145,18 @@ auto Game::checkSelected() -> bool {
 }
 
 auto Game::colorButGame(sf::RenderWindow &window, std::unique_ptr<Button> &button, int x, int y) -> void {
-    if (button->isMouseOver(window) && checkSelected())
-        if (button->getText().getFillColor() == sf::Color::Green)
-            button->getText().setFillColor(button->getDefColor());
-        else
-            checkMove(button, x, y);
-    else if (button->isMouseOver(window))
-        if ((turn && button->getText().getString() == "2") || (!turn && button->getText().getString() == "1"))
-            button->getText().setFillColor(sf::Color::Green);
+    if (!mode) {
+        if (button->isMouseOver(window) && checkSelected())
+            if (button->getText().getFillColor() == sf::Color::Green)
+                button->getText().setFillColor(button->getDefColor());
+            else
+                checkMove(button, x, y);
+        else if (button->isMouseOver(window))
+            if ((turn && button->getText().getString() == "2") || (!turn && button->getText().getString() == "1"))
+                button->getText().setFillColor(sf::Color::Green);
+    } else {
+
+    }
 }
 
 auto Game::checkMove(std::unique_ptr<Button> &button, int x, int y) -> void {
@@ -174,7 +177,7 @@ auto Game::checkMove(std::unique_ptr<Button> &button, int x, int y) -> void {
         }
 
         std::vector<std::vector<int>> offsetEnemy = {
-                /*            {-2, 0},*/
+                {-2, 0},
                 {-1, -1},
                 {-1, 0},
                 {-1, 1},
@@ -183,23 +186,32 @@ auto Game::checkMove(std::unique_ptr<Button> &button, int x, int y) -> void {
                 {0,  1},
                 {1,  0},
                 {1,  1},
-                /*{2,  0}*/
+                {2,  0}
         };
 
         for (const auto &offset: offsetEnemy) {
             auto newY = y + offset[0];
             auto newX = x + offset[1];
 
-            if (mapBut[newY].size() == 5) {
-                if ((offset[0] == 1 && offset[1] == -1) ||
-                    (offset[0] == -1 && offset[1] == -1)) {
-                    continue;
-                }
-            } else if (mapBut[newY].size() <= 4)
-                if ((offset[0] == -1 && offset[1] == 1) ||
-                    (offset[0] == 1 && offset[1] == 1)) {
-                    continue;
-                }
+//            if (mapBut[newY].size() == 5) {
+//                if ((offset[0] == 1 && offset[1] == -1) ||
+//                    (offset[0] == -1 && offset[1] == -1)) {
+//                    continue;
+//                }
+//            } else if (mapBut[newY].size() <= 4)
+//                if ((offset[0] == -1 && offset[1] == 1) ||
+//                    (offset[0] == 1 && offset[1] == 1)) {
+//                    continue;
+//                }
+//
+//
+//            auto biggest = std::max(mapBut[newY].size(), mapBut[y].size());
+//            auto smallest = std::min(mapBut[newY].size(), mapBut[y].size());
+//            std::cout << smallest << " " << biggest << std::endl;
+//
+//            if (newX >= mapBut[newY].size()) {
+//                newX = mapBut[newY].size() - 1;
+//            }
 
             if (newX >= 0 && newY < mapBut.size() && newY >= 0 && newX < mapBut[newY].size()) {
                 if (mapBut[newY][newX]->getText().getString() == "2" && !turn) {
@@ -218,13 +230,12 @@ auto Game::checkMove(std::unique_ptr<Button> &button, int x, int y) -> void {
             button->getText().setString("2");
             button->getText().setFillColor(sf::Color::Cyan);
             button->setDefColor(sf::Color::Cyan);
-            turn = false;
         } else {
             button->getText().setString("1");
             button->getText().setFillColor(sf::Color::Blue);
             button->setDefColor(sf::Color::Blue);
-            turn = true;
         }
+        turn = !turn;
     }
 }
 
@@ -237,4 +248,68 @@ auto Game::counter(int ch) -> std::string {
                 count++;
 
     return std::to_string(count);
+}
+
+auto Game::aiMakeMove(sf::RenderWindow &window) -> void {
+
+}
+
+auto Game::saveInFile(int player1, int player2) -> void {
+    auto result = readFile();
+    std::vector<std::vector<int>> results;
+    auto secondValue = true;
+    auto putInFile = std::stringstream();
+    auto file = std::ofstream("results.txt");
+
+    auto pattern = std::regex(": (\\d+)");
+    std::smatch match;
+    auto iss = std::istringstream(result);
+    std::string line;
+
+    while (std::getline(iss, line))
+        while (std::regex_search(line, match, pattern)) {
+            int value = std::stoi(match[1].str());
+            secondValue ? results.push_back({value}) : results.back().push_back(value);
+            secondValue = !secondValue;
+            line = match.suffix().str();
+        }
+
+    auto sortResults = [](const std::vector<int> &first, const std::vector<int> &second) -> bool {
+        int nonNullA = 0, nonNullB = 0;
+
+        if (first[1] != 0)
+            nonNullA = first[1];
+
+        if (second[1] != 0)
+            nonNullB = second[1];
+
+        return abs(nonNullA - first[0]) > abs(nonNullB - second[0]);
+    };
+
+    results.push_back({player1});
+    results.back().push_back(player2);
+
+    std::sort(results.begin(), results.end(), sortResults);
+
+    if (results.size() == 6)
+        results.erase(results.begin() + results.size());
+
+    for (auto &resultInFile: results)
+        putInFile << "Player 1: " << resultInFile[0] << "; Player 2: " << resultInFile[1] << '\n';
+
+    file << putInFile.str();
+
+    file.close();
+}
+
+auto Game::readFile() -> std::string {
+    std::ifstream file("results.txt");
+    std::string result;
+    std::string line;
+
+    while (getline(file, line))
+        result += line + '\n';
+
+    file.close();
+    return result;
 }
