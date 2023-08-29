@@ -72,9 +72,6 @@ auto main() -> int {
                             computerVsPlayer.colorButMenu(window);
                             playerVsPlayer.colorButMenu(window);
                             break;
-                        case GameState::inGame:
-
-                            break;
                     }
                     break;
                 case sf::Event::Closed:
@@ -87,10 +84,9 @@ auto main() -> int {
                         window.close();
                     else if (highScores.isMouseOver(window) && currentState == GameState::inMainMenu)
                         currentState = GameState::inHighScores;
-                    else if (computerVsPlayer.isMouseOver(window) && currentState == GameState::inMode) {
+                    else if (computerVsPlayer.isMouseOver(window) && currentState == GameState::inMode)
                         currentState = GameState::inGame;
-                        game = Game(true);
-                    } else if (playerVsPlayer.isMouseOver(window) && currentState == GameState::inMode) {
+                    else if (playerVsPlayer.isMouseOver(window) && currentState == GameState::inMode) {
                         currentState = GameState::inGame;
                         game = Game(false);
                     } else if (currentState == GameState::inGame)
@@ -101,7 +97,7 @@ auto main() -> int {
                          currentState == GameState::inHighScores) &&
                         event.key.code == sf::Keyboard::Escape) {
                         if (currentState == GameState::inGame)
-                            game.saveInFile(stoi(game.counter(1)), stoi(game.counter(2)));
+                            Game::saveInFile(stoi(game.counter(1)), stoi(game.counter(2)));
                         currentState = GameState::inMainMenu;
                         first = true;
                     }
