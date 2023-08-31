@@ -1,6 +1,7 @@
 #pragma once
 
 #include "button.h"
+#include "gamestate.h"
 #include <vector>
 #include <memory>
 #include <sstream>
@@ -12,10 +13,14 @@
 #include <ranges>
 #include <regex>
 #include <map>
+#include <ctime>
+#include <filesystem>
 
 class Game {
 public:
     explicit Game(bool mode);
+
+    explicit Game(const std::vector<std::vector<int>>& mapInt);
 
     auto initializeMap(sf::RenderWindow &window, const sf::Font &font) -> void;
 
@@ -35,13 +40,21 @@ public:
 
     auto aiMakeMove(/*std::pair<const std::vector<int>, int> window*/) -> void;
 
+    auto findSelected() -> std::vector<int>;
+
     static auto saveInFile(int first, int second) -> void;
 
     static auto readFile() -> std::string;
 
     auto disableColor(bool ch) -> void;
 
-    auto colorPossible(int y, int x) -> void;
+    auto colorPossible(/*int y, int x*/) -> void;
+
+    auto saveGame() -> void;
+
+    static auto loadGame(const std::string& path) -> Game;
+
+    static auto loadGameBut(const sf::Font &font) -> std::vector<std::unique_ptr<Button>>;
 
 private:
     std::vector<std::vector<int>> mapInt = {{3},
@@ -62,6 +75,24 @@ private:
                                             {1, 1},
                                             {2}
     };
+//    std::vector<std::vector<int>> mapInt = {{-1, -1, 3,  -1, -1},
+//                                            {-1, 1,  -1, 1,  -1},
+//                                            {1,  1,  1,  -1, -1},
+//                                            {1,  1,  1,  1,  -1},
+//                                            {2,  1,  1,  1,  2},
+//                                            {1,  1,  1,  1,  -1},
+//                                            {1,  1,  0,  1,  1},
+//                                            {1,  1,  1,  1,  -1},
+//                                            {1,  1,  1,  1,  1},
+//                                            {1,  0,  1,  0,  -1},
+//                                            {1,  1,  1,  1,  1},
+//                                            {1,  1,  1,  1,  -1},
+//                                            {3,  1,  1,  1,  3},
+//                                            {1,  1,  1,  1,  -1},
+//                                            {1,  1,  1,  -1, -1},
+//                                            {1,  1,  -1, -1, -1},
+//                                            {2,  -1, -1, -1, -1},
+//    };
 //    std::vector<std::vector<int>> mapInt = {{3},
 //                                            {1, 1},
 //                                            {1, 1, 1},
@@ -86,6 +117,6 @@ private:
             {2,  0}
     };
     bool mode;
-    bool turn;
+    bool turn = false;
     std::vector<std::vector<std::unique_ptr<Button>>> mapBut;
 };

@@ -4,13 +4,13 @@
 
 class Button {
 public:
-    Button(const std::string &text, const sf::Vector2f &size, const int &charSize, const sf::Color &back);
+    Button(const std::string &text, const sf::Vector2f &size, const int &charSize, const sf::Color &back, const sf::Vector2f &pos, const sf::Font &font, float width, float height);
 
     sf::Text &getText();
 
     sf::RectangleShape &getButton();
 
-     sf::Color &getDefColor();
+    sf::Color &getDefColor();
 
     void setDefColor(const sf::Color &defColor);
 

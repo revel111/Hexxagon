@@ -1,11 +1,13 @@
 #include "button.h"
 
-Button::Button(const std::string &text, const sf::Vector2f &size, const int &charSize, const sf::Color &back) {
+Button::Button(const std::string &text, const sf::Vector2f &size, const int &charSize, const sf::Color &back, const sf::Vector2f &pos, const sf::Font &font, float width, float height) {
     this->text.setString(text);
     this->text.setFillColor(sf::Color::White);
     this->text.setCharacterSize(charSize);
     button.setSize(size);
     button.setFillColor(back);
+    setPosition(pos, width, height);
+    getText().setFont(font);
 }
 
 sf::Text &Button::getText() {
