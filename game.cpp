@@ -2,10 +2,18 @@
 
 Game::Game(bool mode) {
     this->mode = mode;
+    turn = false;
 }
 
-Game::Game(const std::vector<std::vector<int>> &mapInt) {
+Game::Game(const std::vector<std::vector<int>> &mapInt, bool mode, bool turn, const sf::Time &timer) {
     this->mapInt = mapInt;
+    this->mode = mode;
+    this->turn = turn;
+    this->timer = timer;
+}
+
+sf::Time &Game::getTimer() {
+    return timer;
 }
 
 auto Game::initializeMap(sf::RenderWindow &window, const sf::Font &font) -> void {
@@ -342,8 +350,8 @@ auto Game::saveInFile(int player1, int player2) -> void {
 
     auto pattern = std::regex(": (\\d+)");
     auto iss = std::istringstream(result);
-    std::smatch match;
-    std::string line;
+    auto match = std::smatch();
+    auto line = std::string();
 
     while (std::getline(iss, line))
         while (std::regex_search(line, match, pattern)) {
@@ -354,7 +362,7 @@ auto Game::saveInFile(int player1, int player2) -> void {
         }
 
     auto sortResults = [](const std::vector<int> &first, const std::vector<int> &second) -> bool {
-        int nonNullA = 0, nonNullB = 0;
+        auto nonNullA = 0, nonNullB = 0;
 
         if (first[1] != 0)
             nonNullA = first[1];
@@ -383,8 +391,8 @@ auto Game::saveInFile(int player1, int player2) -> void {
 
 auto Game::readFile() -> std::string {
     auto file = std::ifstream("results.txt");
-    std::string result;
-    std::string line;
+    auto result = std::string();
+    auto line = std::string();
 
     while (getline(file, line))
         result += line + '\n';
@@ -404,7 +412,7 @@ auto Game::disableColor(bool ch) -> void {
 }
 
 auto Game::saveGame() -> void {
-    auto now = time(0);
+    auto now = time(nullptr);
     auto putInFile = std::stringstream();
     char timeString[80];
 
@@ -427,6 +435,20 @@ auto Game::saveGame() -> void {
         file << '\n';
     }
 
+    putInFile = std::stringstream();
+
+    if (mode)
+        putInFile << " Mode " << "1 ";
+    else
+        putInFile << " Mode " << "0 ";
+
+    if (turn)
+        putInFile << "Turn " << "1";
+    else
+        putInFile << "Turn " << "0";
+
+    file << "Time " << timer.asSeconds() << putInFile.str();
+
     file.close();
 }
 
@@ -435,27 +457,37 @@ auto Game::loadGame(const std::string &path) -> Game {
     putInFile << "savings/" << path;
     auto file = std::ifstream(putInFile.str());
     auto newMapInt = std::vector<std::vector<int>>();
-    std::string line;
-    auto word = 0;
+    auto line = std::string();
+    auto turnFrom = false;
+    auto modeFrom = false;
+    float varTime = 0.0;
 
     while (getline(file, line, '\n')) {
         auto tempVec = std::vector<int>();
         auto ss = std::istringstream(line);
 
-        while (ss >> word)
-            tempVec.push_back(word);
-
+        while (ss >> line) {
+            if (line == "Time")
+                ss >> varTime;
+            else if (line == "Mode")
+                ss >> modeFrom;
+            else if (line == "Turn")
+                ss >> turnFrom;
+            else
+                tempVec.push_back(stoi(line));
+        }
         newMapInt.emplace_back(tempVec);
     }
 
+    auto timeString = sf::seconds(varTime);
+
     file.close();
 
-    return Game(newMapInt);
+    return {newMapInt, modeFrom, turnFrom, timeString};
 }
 
 auto Game::loadGameBut(const sf::Font &font) -> std::vector<std::unique_ptr<Button>> {
     auto newVector = std::vector<std::unique_ptr<Button>>();
-
     auto pos = sf::Vector2f{500, 150};
 
     for (const auto &entry: std::filesystem::directory_iterator("savings")) {

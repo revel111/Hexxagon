@@ -20,7 +20,9 @@ class Game {
 public:
     explicit Game(bool mode);
 
-    explicit Game(const std::vector<std::vector<int>>& mapInt);
+    Game(const std::vector<std::vector<int>> &mapInt, bool mode, bool turn, const sf::Time &timer);
+
+    auto getTimer() -> sf::Time &;
 
     auto initializeMap(sf::RenderWindow &window, const sf::Font &font) -> void;
 
@@ -52,7 +54,7 @@ public:
 
     auto saveGame() -> void;
 
-    static auto loadGame(const std::string& path) -> Game;
+    static auto loadGame(const std::string &path) -> Game;
 
     static auto loadGameBut(const sf::Font &font) -> std::vector<std::unique_ptr<Button>>;
 
@@ -116,7 +118,9 @@ private:
             {1,  1},
             {2,  0}
     };
+
+    sf::Time timer = sf::seconds(0);
     bool mode;
-    bool turn = false;
+    bool turn;
     std::vector<std::vector<std::unique_ptr<Button>>> mapBut;
 };

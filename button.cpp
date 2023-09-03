@@ -1,6 +1,7 @@
 #include "button.h"
 
-Button::Button(const std::string &text, const sf::Vector2f &size, const int &charSize, const sf::Color &back, const sf::Vector2f &pos, const sf::Font &font, float width, float height) {
+Button::Button(const std::string &text, const sf::Vector2f &size, const int &charSize, const sf::Color &back,
+               const sf::Vector2f &pos, const sf::Font &font, float width, float height) {
     this->text.setString(text);
     this->text.setFillColor(sf::Color::White);
     this->text.setCharacterSize(charSize);
@@ -54,11 +55,6 @@ auto Button::isMouseOver(sf::RenderWindow &window) -> bool {
         return true;
 
     return false;
-}
-
-auto Button::initializeBut(const sf::Vector2f &pos, const sf::Font &font, float width, float height) -> void {
-    this->setPosition(pos, width, height);
-    this->getText().setFont(font);
 }
 
 auto Button::colorButMenu(sf::RenderWindow &window) -> void {

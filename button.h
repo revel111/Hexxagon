@@ -4,13 +4,14 @@
 
 class Button {
 public:
-    Button(const std::string &text, const sf::Vector2f &size, const int &charSize, const sf::Color &back, const sf::Vector2f &pos, const sf::Font &font, float width, float height);
+    Button(const std::string &text, const sf::Vector2f &size, const int &charSize, const sf::Color &back,
+           const sf::Vector2f &pos, const sf::Font &font, float width, float height);
 
-    sf::Text &getText();
+    auto getText() -> sf::Text &;
 
-    sf::RectangleShape &getButton();
+    auto getButton() -> sf::RectangleShape &;
 
-    sf::Color &getDefColor();
+    auto getDefColor() -> sf::Color &;
 
     void setDefColor(const sf::Color &defColor);
 
@@ -19,8 +20,6 @@ public:
     auto drawBut(sf::RenderWindow &window) -> void;
 
     auto isMouseOver(sf::RenderWindow &window) -> bool;
-
-    auto initializeBut(const sf::Vector2f &pos, const sf::Font &font, float width, float height) -> void;
 
     auto colorButMenu(sf::RenderWindow &window) -> void;
 

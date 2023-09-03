@@ -5,11 +5,12 @@
 auto main() -> int {
     auto currentState = GameState::inMainMenu;
 
+    auto game = Game(true);
+
     auto window = sf::RenderWindow(sf::VideoMode(1200, 800), "Hexxagon");
     auto font = sf::Font{};
     auto icon = sf::Image{};
     auto clock = sf::Clock{};
-    auto timer = sf::seconds(0);
     auto first = true;
     auto timerText = sf::Text("", font, 20);
     auto score = sf::Text("", font);
@@ -44,8 +45,6 @@ auto main() -> int {
     auto backgroundIm = sf::Texture{};
     backgroundIm.loadFromFile("backgroundMenu.jpg");
     auto background = sf::Sprite(backgroundIm);
-
-    auto game = Game(true);
 
     while (window.isOpen()) {
         auto event = sf::Event{};
@@ -91,7 +90,7 @@ auto main() -> int {
 //                                first = false;
                             }
                     } else if (currentState == GameState::inSaveGame) {
-                        for (const auto &i: loadVector) {
+                        for (const auto &i: loadVector)
                             if (i->isMouseOver(window) && i->getText().getString() != "Empty") {
                                 auto result = std::stringstream();
                                 std::string str = i->getText().getString();
@@ -100,7 +99,6 @@ auto main() -> int {
                                 std::filesystem::remove(file);
 //                                first = true;
                             }
-                        }
                         game.saveGame();
                         currentState = GameState::inMainMenu;
                     } else if (exit.isMouseOver(window) && currentState == GameState::inMainMenu)
@@ -110,15 +108,15 @@ auto main() -> int {
                     else if (computerVsPlayer.isMouseOver(window) && currentState == GameState::inMode) {
                         currentState = GameState::inGame;
                         first = true;
-                    }
-                    else if (playerVsPlayer.isMouseOver(window) && currentState == GameState::inMode) {
+                    } else if (playerVsPlayer.isMouseOver(window) && currentState == GameState::inMode) {
                         currentState = GameState::inGame;
                         game = Game(false);
                         first = true;
                     } else if (saveGame.isMouseOver(window) && currentState == GameState::inGame)
                         currentState = GameState::inSaveGame;
-                     else if (currentState == GameState::inGame)
+                    else if (currentState == GameState::inGame) {
                         game.makeMove(window);
+                    }
                     break;
                 case sf::Event::KeyPressed:
                     if ((currentState == GameState::inGame || currentState == GameState::inMode ||
@@ -168,7 +166,7 @@ auto main() -> int {
                 if (first) {
                     game.initializeMap(window, font);
                     first = false;
-                    timer = sf::seconds(0);
+                    game.getTimer() = sf::seconds(0);
                     clock.restart();
                 } else if (game.checkEnd()/*true*/) {
                     auto result = std::stringstream();
@@ -186,8 +184,8 @@ auto main() -> int {
                     saveGame.drawBut(window);
 
                     auto elapsedTime = clock.restart();
-                    timer += elapsedTime;
-                    timerText.setString(std::to_string(timer.asSeconds()));
+                    game.getTimer() += elapsedTime;
+                    timerText.setString(std::to_string(game.getTimer().asSeconds()));
 
                     player1.getText().setString(game.counter(1));
                     player2.getText().setString(game.counter(2));
