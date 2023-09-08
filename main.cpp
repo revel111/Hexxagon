@@ -15,9 +15,11 @@ auto main() -> int {
     auto timerText = sf::Text("", font, 20);
     auto score = sf::Text("", font);
     auto loadGameText = sf::Text("Load Game", font, 25);
-    auto saveGameText = sf::Text("Choose slot to overwrite", font, 20);
-    loadGameText.setPosition(550, 50);
-    saveGameText.setPosition(500, 50);
+    auto saveGameText = sf::Text("Choose slot to overwrite", font, 23);
+    auto deleteGameText = sf::Text("Choose slot to delete", font, 25);
+    loadGameText.setPosition(550, 100);
+    saveGameText.setPosition(485, 100);
+    deleteGameText.setPosition(500, 100);
 
     timerText.setPosition(1090, 510);
     timerText.setFillColor(sf::Color::White);
@@ -39,6 +41,7 @@ auto main() -> int {
     auto player2 = Button("0", {50, 50}, 20, sf::Color::Cyan, {1100, 600}, font, 3, 4);
     auto gameOver = Button("Game over!", {200, 100}, 17, sf::Color(128, 128, 128), {500, 300}, font, 5, 10);
     auto saveGame = Button("Save Game", {100, 50}, 17, sf::Color(128, 128, 128), {1075, 700}, font, 10, 3);
+    auto deleteGame = Button("Delete Game", {125, 50}, 17, sf::Color(128, 128, 128), {1000, 700}, font, 10, 3);
 
     auto loadVector = Game::loadGameBut(font);
 
@@ -58,8 +61,10 @@ auto main() -> int {
                             highScores.colorButMenu(window);
                             exit.colorButMenu(window);
                             break;
-                        case GameState::inSaveGame:
                         case GameState::inLoadGame:
+                            deleteGame.colorButMenu(window);
+                        case GameState::inDeleteGame:
+                        case GameState::inSaveGame:
                             for (const auto &i: loadVector)
                                 i->colorButMenu(window);
                             break;
@@ -89,7 +94,9 @@ auto main() -> int {
                                 currentState = GameState::inGame;
 //                                first = false;
                             }
-                    } else if (currentState == GameState::inSaveGame) {
+                        if (deleteGame.isMouseOver(window))
+                            currentState = GameState::inDeleteGame;
+                    } else if (currentState == GameState::inSaveGame || currentState == GameState::inDeleteGame) {
                         for (const auto &i: loadVector)
                             if (i->isMouseOver(window) && i->getText().getString() != "Empty") {
                                 auto result = std::stringstream();
@@ -99,7 +106,8 @@ auto main() -> int {
                                 std::filesystem::remove(file);
 //                                first = true;
                             }
-                        game.saveGame();
+                        if (currentState == GameState::inSaveGame)
+                            game.saveGame();
                         currentState = GameState::inMainMenu;
                     } else if (exit.isMouseOver(window) && currentState == GameState::inMainMenu)
                         window.close();
@@ -121,7 +129,7 @@ auto main() -> int {
                 case sf::Event::KeyPressed:
                     if ((currentState == GameState::inGame || currentState == GameState::inMode ||
                          currentState == GameState::inHighScores || currentState == GameState::inLoadGame ||
-                         currentState == GameState::inSaveGame) &&
+                         currentState == GameState::inSaveGame || currentState == GameState::inDeleteGame) &&
                         event.key.code == sf::Keyboard::Escape) {
                         if (currentState == GameState::inGame)
                             Game::saveInFile(stoi(game.counter(1)), stoi(game.counter(2)));
@@ -143,12 +151,19 @@ auto main() -> int {
             case GameState::inLoadGame:
                 window.draw(background);
                 window.draw(loadGameText);
+                deleteGame.drawBut(window);
                 for (const auto &i: loadVector)
                     i->drawBut(window);
                 break;
             case GameState::inSaveGame:
                 window.draw(background);
                 window.draw(saveGameText);
+                for (const auto &i: loadVector)
+                    i->drawBut(window);
+                break;
+            case GameState::inDeleteGame:
+                window.draw(background);
+                window.draw(deleteGameText);
                 for (const auto &i: loadVector)
                     i->drawBut(window);
                 break;

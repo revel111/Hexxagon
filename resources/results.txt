@@ -1,0 +1,5 @@
+Player 1: 0; Player 2: 20
+Player 1: 0; Player 2: 10
+Player 1: 7; Player 2: 0
+Player 1: 7; Player 2: 0
+Player 1: 0; Player 2: 6

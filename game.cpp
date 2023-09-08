@@ -185,9 +185,17 @@ auto Game::checkMove(int y, int x) -> void {
 //            mapBut[selected.at(0)][selected.at(1)]->getText().setFillColor(sf::Color::White);
 //        }
 
+    auto result = abs(mapBut[selectedY].size() - mapBut[y].size());
+
     if (abs(selectedX - x) <= 2 && abs(selectedY - y) <= 4 &&
-        ((selectedX + selectedY) - (x + y)) <= 2 &&
+        /*((selectedX + selectedY) - (x + y)) <= 2*/ /*result <= 2 &&*/
         mapBut[y][x]->getText().getString() == "O") {
+
+        if (result >= 3 && abs(selectedX - x) == 1) {
+            mapBut[y][x]->getText().setFillColor(sf::Color::Red);
+            disableColor(false);
+            return;
+        }
         if ((abs(selectedX - x) == 2) || ((abs(selectedY - y)) == 4) || ((abs(selectedY - y)) == 3)) {
             mapBut[selectedY][selectedX]->getText().setString("O");
             mapBut[selectedY][selectedX]->setDefColor(sf::Color::White);
@@ -270,6 +278,7 @@ auto Game::colorPossible(/*int y, int x*/) -> void {
 
 auto Game::counter(int ch) -> std::string {
     auto count = 0;
+
     for (auto &i: mapBut)
         for (const auto &j: i)
             if ((j->getText().getString() == "1" && ch == 1) || (j->getText().getString() == "2" && ch == 2) ||
@@ -280,59 +289,69 @@ auto Game::counter(int ch) -> std::string {
 }
 
 auto Game::aiMakeMove() -> void {
-    std::map<std::vector<int>, int> choices;
+    std::map<std::pair<std::pair<int, int>, std::pair<int, int>>, int> choices;
+
     for (auto i = 0; i < mapBut.size(); i++) {
         for (auto j = 0; j < mapBut[i].size(); j++) {
             if (mapBut[i][j]->getText().getString() == "2") {
-                std::vector<int> newVector;
-                newVector.insert(newVector.end(), {i, j});
-                choices.insert({newVector, 0});
+                std::pair<int, int> selected;
+                selected.first = i, selected.second = j;
 
-//                for (int k = 0; k < ; ++k) {
-//
-//                }
-
-                for (const auto &offset: offsetEnemy) {
-                    auto newY = i + offset[0];
-                    auto newX = j + offset[1];
-
-//            if (mapBut[newY].size() == 5) {
-//                if ((offset[0] == 1 && offset[1] == -1) ||
-//                    (offset[0] == -1 && offset[1] == -1)) {
-//                    continue;
-//                }
-//            } else if (mapBut[newY].size() <= 4)
-//                if ((offset[0] == -1 && offset[1] == 1) ||
-//                    (offset[0] == 1 && offset[1] == 1)) {
-//                    continue;
-//                }
-//
-//
-//            auto biggest = std::max(mapBut[newY].size(), mapBut[y].size());
-//            auto smallest = std::min(mapBut[newY].size(), mapBut[y].size());
-//            std::cout << smallest << " " << biggest << std::endl;
-//
-//            if (newX >= mapBut[newY].size()) {
-//                newX = mapBut[newY].size() - 1;
-//            }
-                    if (newX >= 0 && newY < mapBut.size() && newY >= 0 && newX < mapBut[newY].size() &&
-                        mapBut[newY][newX]->getText().getString() == "O")
-                        choices.find(newVector)->second++;
-                } //offset for walking
             }
         }
     }
 
-    auto best = std::max_element(choices.begin(), choices.end(),
-                                 [](std::pair<const std::vector<int>, int> a,
-                                    std::pair<const std::vector<int>, int> b) -> bool {
-                                     return a.second < b.second;
-                                 });
+//    for (auto i = 0; i < mapBut.size(); i++) {
+//        for (auto j = 0; j < mapBut[i].size(); j++) {
+//            if (mapBut[i][j]->getText().getString() == "2") {
+//                std::vector<int> newVector;
+//                newVector.insert(newVector.end(), {i, j});
+//                choices.insert({newVector, 0});
+//
+////                for (int k = 0; k < ; ++k) {
+////
+////                }
+//
+//                for (const auto &offset: offsetEnemy) {
+//                    auto newY = i + offset[0];
+//                    auto newX = j + offset[1];
+//
+////            if (mapBut[newY].size() == 5) {
+////                if ((offset[0] == 1 && offset[1] == -1) ||
+////                    (offset[0] == -1 && offset[1] == -1)) {
+////                    continue;
+////                }
+////            } else if (mapBut[newY].size() <= 4)
+////                if ((offset[0] == -1 && offset[1] == 1) ||
+////                    (offset[0] == 1 && offset[1] == 1)) {
+////                    continue;
+////                }
+////
+////
+////            auto biggest = std::max(mapBut[newY].size(), mapBut[y].size());
+////            auto smallest = std::min(mapBut[newY].size(), mapBut[y].size());
+////            std::cout << smallest << " " << biggest << std::endl;
+////
+////            if (newX >= mapBut[newY].size()) {
+////                newX = mapBut[newY].size() - 1;
+////            }
+//                    if (newX >= 0 && newY < mapBut.size() && newY >= 0 && newX < mapBut[newY].size() &&
+//                        mapBut[newY][newX]->getText().getString() == "O")
+//                        choices.find(newVector)->second++;
+//                } //offset for walking
+//            }
+//        }
+//    auto best = std::max_element(choices.begin(), choices.end(),
+//                                 [](std::pair<const std::vector<int>, int> a,
+//                                    std::pair<const std::vector<int>, int> b) -> bool {
+//                                     return a.second < b.second;
+//                                 });
 //    checkMove(best->first.at(0), best->first.at(1));
 }
 
 auto Game::findSelected() -> std::vector<int> {
     auto newVector = std::vector<int>();
+
     for (auto i = 0; i < mapBut.size(); i++)
         for (auto j = 0; j < mapBut[i].size(); j++)
             if (mapBut[i][j]->getText().getFillColor() == sf::Color::Green)
@@ -361,22 +380,21 @@ auto Game::saveInFile(int player1, int player2) -> void {
             line = match.suffix().str();
         }
 
-    auto sortResults = [](const std::vector<int> &first, const std::vector<int> &second) -> bool {
-        auto nonNullA = 0, nonNullB = 0;
-
-        if (first[1] != 0)
-            nonNullA = first[1];
-
-        if (second[1] != 0)
-            nonNullB = second[1];
-
-        return abs(nonNullA - first[0]) > abs(nonNullB - second[0]);
-    };
-
     results.push_back({player1});
     results.back().push_back(player2);
 
-    std::sort(results.begin(), results.end(), sortResults);
+    std::sort(results.begin(), results.end(),
+              [](const std::vector<int> &first, const std::vector<int> &second) -> bool {
+                  auto nonNullA = 0, nonNullB = 0;
+
+                  if (first[1] != 0)
+                      nonNullA = first[1];
+
+                  if (second[1] != 0)
+                      nonNullB = second[1];
+
+                  return abs(nonNullA - first[0]) > abs(nonNullB - second[0]);
+              });
 
     if (results.size() == 6)
         results.erase(results.begin() + results.size());
@@ -398,6 +416,7 @@ auto Game::readFile() -> std::string {
         result += line + '\n';
 
     file.close();
+
     return result;
 }
 
@@ -435,19 +454,7 @@ auto Game::saveGame() -> void {
         file << '\n';
     }
 
-    putInFile = std::stringstream();
-
-    if (mode)
-        putInFile << " Mode " << "1 ";
-    else
-        putInFile << " Mode " << "0 ";
-
-    if (turn)
-        putInFile << "Turn " << "1";
-    else
-        putInFile << "Turn " << "0";
-
-    file << "Time " << timer.asSeconds() << putInFile.str();
+    file << "Time " << timer.asSeconds() << " Mode " << mode << " Turn " << turn;
 
     file.close();
 }
@@ -455,6 +462,7 @@ auto Game::saveGame() -> void {
 auto Game::loadGame(const std::string &path) -> Game {
     auto putInFile = std::stringstream();
     putInFile << "savings/" << path;
+
     auto file = std::ifstream(putInFile.str());
     auto newMapInt = std::vector<std::vector<int>>();
     auto line = std::string();
