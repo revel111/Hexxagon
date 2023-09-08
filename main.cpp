@@ -93,7 +93,6 @@ auto main() -> int {
                                 game = Game::loadGame(i->getText().getString());
                                 game.initializeMap(window, font);
                                 currentState = GameState::inGame;
-//                                first = false;
                             }
                         if (deleteGame.isMouseOver(window))
                             currentState = GameState::inDeleteGame;
@@ -105,7 +104,6 @@ auto main() -> int {
                                 result << "savings/" << str;
                                 auto file = std::filesystem::path(result.str());
                                 std::filesystem::remove(file);
-//                                first = true;
                             }
                         if (currentState == GameState::inSaveGame)
                             game.saveGame();
