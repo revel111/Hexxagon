@@ -17,6 +17,7 @@ auto main() -> int {
     auto loadGameText = sf::Text("Load Game", font, 25);
     auto saveGameText = sf::Text("Choose slot to overwrite", font, 23);
     auto deleteGameText = sf::Text("Choose slot to delete", font, 25);
+
     loadGameText.setPosition(550, 100);
     saveGameText.setPosition(485, 100);
     deleteGameText.setPosition(500, 100);
