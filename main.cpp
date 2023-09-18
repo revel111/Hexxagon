@@ -93,6 +93,7 @@ auto main() -> int {
                                 game = Game::loadGame(i->getText().getString());
                                 game.initializeMap(window, font);
                                 currentState = GameState::inGame;
+                                first = false;
                             }
                         if (deleteGame.isMouseOver(window))
                             currentState = GameState::inDeleteGame;
@@ -114,6 +115,7 @@ auto main() -> int {
                         currentState = GameState::inHighScores;
                     else if (computerVsPlayer.isMouseOver(window) && currentState == GameState::inMode) {
                         currentState = GameState::inGame;
+                        game = Game(true);
                         first = true;
                     } else if (playerVsPlayer.isMouseOver(window) && currentState == GameState::inMode) {
                         currentState = GameState::inGame;
@@ -133,7 +135,6 @@ auto main() -> int {
                         if (currentState == GameState::inGame)
                             Game::saveInFile(stoi(game.counter(1)), stoi(game.counter(2)));
                         currentState = GameState::inMainMenu;
-//                        first = true;
                     }
             }
 
@@ -182,7 +183,7 @@ auto main() -> int {
                     first = false;
                     game.getTimer() = sf::seconds(0);
                     clock.restart();
-                } else if (game.checkEnd()/*true*/) {
+                } else if (game.checkEnd()) {
                     auto result = std::stringstream();
                     result << "    Game over!\n     Player 1: " << game.counter(1) << "\n     Player 2: "
                            << game.counter(2)

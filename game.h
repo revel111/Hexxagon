@@ -40,9 +40,7 @@ public:
 
     auto counter(int ch) -> std::string;
 
-    auto aiMakeMove(/*std::pair<const std::vector<int>, int> window*/) -> void;
-
-    auto findSelected() -> std::vector<int>;
+    auto aiMakeMove() -> void;
 
     static auto saveInFile(int first, int second) -> void;
 
@@ -50,7 +48,7 @@ public:
 
     auto disableColor(bool ch) -> void;
 
-    auto colorPossible(/*int y, int x*/) -> void;
+    auto colorPossible(int y, int x) -> void;
 
     auto saveGame() -> void;
 
@@ -94,17 +92,6 @@ private:
 //                                            {1,  1,  1,  -1, -1},
 //                                            {1,  1,  -1, -1, -1},
 //                                            {2,  -1, -1, -1, -1},
-//    };
-//    std::vector<std::vector<int>> mapInt = {{3},
-//                                            {1, 1},
-//                                            {1, 1, 1},
-//                                            {2, 1, 1, 2}
-//    };
-//    std::vector<std::vector<int>> mapInt = {{3, 1, 1, 1, 3},
-//                                            {1, 1, 1, 1},
-//                                            {1, 1, 1, 1, 1},
-//                                            {1, 1, 1, 1},
-//                                            {2, 1, 1, 1, 2},
 //    };
     std::vector<std::vector<int>> offsetEnemy = {
             {-2, 0},

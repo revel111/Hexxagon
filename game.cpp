@@ -28,22 +28,7 @@ auto Game::initializeMap(sf::RenderWindow &window, const sf::Font &font) -> void
     auto startY = (800 - (std::sqrt(3.0f) * 25) * (mapInt.size() + 0.5)) / 2;
 
     for (auto i = 0; i < mapInt.size(); i++) {
-        auto currentStartX = startX;
-        switch (mapInt[i].size()) {
-            case 1:
-                currentStartX += 150;
-                break;
-            case 2:
-                currentStartX += 110;
-                break;
-            case 3:
-                currentStartX += 75;
-                break;
-            case 4:
-                currentStartX += 35;
-                break;
-        }
-
+        auto currentStartX = startX + 140 - (35 * mapInt[i].size() - 1);
         for (auto j = 0; j < mapInt[i].size(); j++) {
             auto pos = sf::Vector2f{currentStartX + j * (50 * 1.5f),
                                     static_cast<float>(startY + i * (std::sqrt(3.0f) * 25) + 1)};
@@ -88,47 +73,31 @@ auto Game::makeMove(sf::RenderWindow &window) -> void {
 }
 
 auto Game::checkEnd() -> bool {
-    /*auto totalCounter = 0;
-    for (auto i = 0; i < mapBut.size(); i++)
-        for (auto j = 0; j < mapBut[i].size(); j++)
-            if (mapBut[i][j]->getText().getString() == "O")
-                return false;
-            else if (mapBut[i][j]->getText().getString() == "1" || mapBut[i][j]->getText().getString() == "2") {
-                auto offsetCounter = 0;
-                for (const auto &offset: offsetEnemy) {
-                    auto newY = i + offset[0];
-                    auto newX = j + offset[1];
+    if (counter(1) == "0" || counter(2) == "0" || counter(3) == "0")
+        return true;
+    auto counter1 = 0;
+    auto counter2 = 0;
 
-                    if (mapBut[newY].size() == 5) {
-                        if ((offset[0] == 1 && offset[1] == -1) ||
-                            (offset[0] == -1 && offset[1] == -1)) {
-                            offsetCounter++;
-                            continue;
-                        }
-                    } else if (mapBut[newY].size() == 4)
-                        if ((offset[0] == -1 && offset[1] == 1) ||
-                            (offset[0] == 1 && offset[1] == 1)) {
-                            offsetCounter++;
-                            continue;
-                        }
+    for (auto y = 0; y < mapBut.size(); y++)
+        for (auto x = 0; x < mapBut[y].size(); x++)
+            if (mapBut[y][x]->getText().getString() == "1" || mapBut[y][x]->getText().getString() == "2")
+                for (const auto &offset: offsetEnemy) {
+                    auto newY = y + offset[0];
+                    auto newX = x + offset[1];
 
                     if (newX >= 0 && newY < mapBut.size() && newY >= 0 && newX < mapBut[newY].size()) {
-                        if (mapBut[newY][newX]->getText().getString() == "2" ||
-                            mapBut[newY][newX]->getText().getString() == "1") {
-                            offsetCounter++;
-                        }
-                    } else
-                        totalCounter++;
-
+                        if (mapBut[newY][newX]->getText().getString() == "0")
+                            return false;
+                        else if (mapBut[newY][newX]->getText().getString() == "2")
+                            counter1++;
+                        else if (mapBut[newY][newX]->getText().getString() == "1")
+                            counter2++;
+                    }
                 }
-                if (offsetCounter == offsetEnemy.size())
-                    totalCounter++;
-                else
-                    return false;
-            }*/
 
-    if (/*totalCounter == mapBut.size() ||*/ counter(1) == "0" || counter(2) == "0" || counter(3) == "0")
+    if (counter1 == 0 || counter2 == 0)
         return true;
+
     return false;
 }
 
@@ -154,20 +123,14 @@ auto Game::colorButGame(sf::RenderWindow &window, int y, int x) -> void {
                 (!turn && mapBut[y][x]->getText().getString() == "1")) {
                 mapBut[y][x]->getText().setFillColor(sf::Color::Green);
                 disableColor(true);
-                colorPossible(/*y, x*/);
+                colorPossible(y, x);
             }
-    } else if (mode && turn) {
+    } else if (mode && turn)
         aiMakeMove();
-        turn = !turn;
-    }
 }
 
 auto Game::checkMove(int y, int x) -> void {
     auto selectedX = 0, selectedY = 0;
-//    auto selected = findSelected();
-
-//    mapBut[selected.at(0)][selected.at(1)]->getText().setFillColor(
-//            mapBut[selected.at(0)][selected.at(1)]->getDefColor());
 
     for (auto i = 0; i < mapBut.size(); i++)
         for (auto j = 0; j < mapBut[i].size(); j++)
@@ -176,26 +139,7 @@ auto Game::checkMove(int y, int x) -> void {
                 mapBut[selectedY][selectedX]->getText().setFillColor(mapBut[selectedY][selectedX]->getDefColor());
             }
 
-//    if (abs(selected.at(1) - x) <= 2 && abs(selected.at(0) - y) <= 4 &&
-//        ((selected.at(1) + selected.at(0)) - (x + y)) <= 2 &&
-//        mapBut[y][x]->getText().getString() == "O") {
-//        if ((abs(selected.at(1) - x) == 2) || ((abs(selected.at(0) - y)) == 4) || ((abs(selected.at(0) - y)) == 3)) {
-//            mapBut[selected.at(0)][selected.at(1)]->getText().setString("O");
-//            mapBut[selected.at(0)][selected.at(1)]->setDefColor(sf::Color::White);
-//            mapBut[selected.at(0)][selected.at(1)]->getText().setFillColor(sf::Color::White);
-//        }
-
-    auto result = abs(mapBut[selectedY].size() - mapBut[y].size());
-
-    if (abs(selectedX - x) <= 2 && abs(selectedY - y) <= 4 &&
-        /*((selectedX + selectedY) - (x + y)) <= 2*/ /*result <= 2 &&*/
-        mapBut[y][x]->getText().getString() == "O") {
-
-        if (result >= 3 && abs(selectedX - x) == 1) {
-            mapBut[y][x]->getText().setFillColor(sf::Color::Red);
-            disableColor(false);
-            return;
-        }
+    if (abs(selectedX - x) <= 2 && abs(selectedY - y) <= 4 && mapBut[y][x]->getText().getString() == "O") {
         if ((abs(selectedX - x) == 2) || ((abs(selectedY - y)) == 4) || ((abs(selectedY - y)) == 3)) {
             mapBut[selectedY][selectedX]->getText().setString("O");
             mapBut[selectedY][selectedX]->setDefColor(sf::Color::White);
@@ -205,26 +149,6 @@ auto Game::checkMove(int y, int x) -> void {
         for (const auto &offset: offsetEnemy) {
             auto newY = y + offset[0];
             auto newX = x + offset[1];
-
-//            if (mapBut[newY].size() == 5) {
-//                if ((offset[0] == 1 && offset[1] == -1) ||
-//                    (offset[0] == -1 && offset[1] == -1)) {
-//                    continue;
-//                }
-//            } else if (mapBut[newY].size() <= 4)
-//                if ((offset[0] == -1 && offset[1] == 1) ||
-//                    (offset[0] == 1 && offset[1] == 1)) {
-//                    continue;
-//                }
-//
-//
-//            auto biggest = std::max(mapBut[newY].size(), mapBut[y].size());
-//            auto smallest = std::min(mapBut[newY].size(), mapBut[y].size());
-//            std::cout << smallest << " " << biggest << std::endl;
-//
-//            if (newX >= mapBut[newY].size()) {
-//                newX = mapBut[newY].size() - 1;
-//            }
 
             if (newX >= 0 && newY < mapBut.size() && newY >= 0 && newX < mapBut[newY].size()) {
                 if (mapBut[newY][newX]->getText().getString() == "2" && !turn) {
@@ -249,31 +173,16 @@ auto Game::checkMove(int y, int x) -> void {
             mapBut[y][x]->setDefColor(sf::Color::Blue);
         }
         turn = !turn;
-        disableColor(false);
-    } else {
+    } else
         mapBut[y][x]->getText().setFillColor(sf::Color::Red);
-        disableColor(false);
-    }
+    disableColor(false);
 }
 
-auto Game::colorPossible(/*int y, int x*/) -> void {
-//    auto selected = findSelected();
-//    auto selectedX = 0, selectedY = 0;
-//
-//    for (auto i = 0; i < mapBut.size(); i++)
-//        for (auto j = 0; j < mapBut[i].size(); j++)
-//            if (mapBut[i][j]->getText().getFillColor() == sf::Color::Green) {
-//                selectedX = j, selectedY = i;
-//                mapBut[selectedY][selectedX]->getText().setFillColor(mapBut[selectedY][selectedX]->getDefColor());
-//            }
-//
-//    for (auto x = 0; x < mapBut.size(); x++)
-//        for (auto y = 0; y < mapBut[x].size(); y++)
-//            if (abs(selectedX - x) <= 2 && abs(selectedY - y) <= 4 &&
-//                ((selectedX + selectedY) - (x + y)) <= 2 &&
-//                mapBut[y][x]->getText().getString() == "O") {
-//                mapBut[y][x]->getText().setFillColor(sf::Color::Yellow);
-//            }
+auto Game::colorPossible(int y, int x) -> void {
+    for (auto i = 0; i < mapBut.size(); i++)
+        for (auto j = 0; j < mapBut[i].size(); j++)
+            if (abs(x - j) <= 2 && abs(y - i) <= 4 && mapBut[i][j]->getText().getString() == "O")
+                mapBut[i][j]->getText().setFillColor(sf::Color::Yellow);
 }
 
 auto Game::counter(int ch) -> std::string {
@@ -289,75 +198,44 @@ auto Game::counter(int ch) -> std::string {
 }
 
 auto Game::aiMakeMove() -> void {
-    std::map<std::pair<std::pair<int, int>, std::pair<int, int>>, int> choices;
+    auto choices = std::map<std::pair<std::pair<int, int>, std::pair<int, int>>, int>();
+    auto selected = std::pair<int, int>();
+    auto available = std::pair<int, int>();
+    auto counter = 0;
 
-    for (auto i = 0; i < mapBut.size(); i++) {
-        for (auto j = 0; j < mapBut[i].size(); j++) {
-            if (mapBut[i][j]->getText().getString() == "2") {
-                std::pair<int, int> selected;
-                selected.first = i, selected.second = j;
+    for (auto selectedY = 0; selectedY < mapBut.size(); selectedY++)  // for searching friend pawns
+        for (auto selectedX = 0; selectedX < mapBut[selectedY].size(); selectedX++) {
+            if (mapBut[selectedY][selectedX]->getText().getString() == "2") {
+                selected = std::pair<int, int>(selectedY, selectedX);
 
+                for (auto availableY = 0; availableY < mapBut.size(); availableY++) // for searching available
+                    for (auto availableX = 0; availableX < mapBut[availableY].size(); availableX++)
+                        if (abs(selected.second - availableX) <= 2 && abs(selected.first - availableY) <= 4 &&
+                            mapBut[availableY][availableX]->getText().getString() == "O") {
+                            available = std::pair<int, int>(availableY, availableX);
+
+                            for (const auto &offset: offsetEnemy) { // for searching possible enemies
+                                auto newX = available.first + offset[0];
+                                auto newY = available.second + offset[1];
+                                counter = 0;
+
+                                if (newX >= 0 && newY < mapBut.size() && newY >= 0 && newX < mapBut[newY].size())
+                                    counter++;
+                            }
+                            choices.insert({std::pair<std::pair<int, int>, std::pair<int, int>>(selected, available),
+                                            counter});
+                        }
             }
         }
-    }
 
-//    for (auto i = 0; i < mapBut.size(); i++) {
-//        for (auto j = 0; j < mapBut[i].size(); j++) {
-//            if (mapBut[i][j]->getText().getString() == "2") {
-//                std::vector<int> newVector;
-//                newVector.insert(newVector.end(), {i, j});
-//                choices.insert({newVector, 0});
-//
-////                for (int k = 0; k < ; ++k) {
-////
-////                }
-//
-//                for (const auto &offset: offsetEnemy) {
-//                    auto newY = i + offset[0];
-//                    auto newX = j + offset[1];
-//
-////            if (mapBut[newY].size() == 5) {
-////                if ((offset[0] == 1 && offset[1] == -1) ||
-////                    (offset[0] == -1 && offset[1] == -1)) {
-////                    continue;
-////                }
-////            } else if (mapBut[newY].size() <= 4)
-////                if ((offset[0] == -1 && offset[1] == 1) ||
-////                    (offset[0] == 1 && offset[1] == 1)) {
-////                    continue;
-////                }
-////
-////
-////            auto biggest = std::max(mapBut[newY].size(), mapBut[y].size());
-////            auto smallest = std::min(mapBut[newY].size(), mapBut[y].size());
-////            std::cout << smallest << " " << biggest << std::endl;
-////
-////            if (newX >= mapBut[newY].size()) {
-////                newX = mapBut[newY].size() - 1;
-////            }
-//                    if (newX >= 0 && newY < mapBut.size() && newY >= 0 && newX < mapBut[newY].size() &&
-//                        mapBut[newY][newX]->getText().getString() == "O")
-//                        choices.find(newVector)->second++;
-//                } //offset for walking
-//            }
-//        }
-//    auto best = std::max_element(choices.begin(), choices.end(),
-//                                 [](std::pair<const std::vector<int>, int> a,
-//                                    std::pair<const std::vector<int>, int> b) -> bool {
-//                                     return a.second < b.second;
-//                                 });
-//    checkMove(best->first.at(0), best->first.at(1));
-}
+    auto best = std::max_element(choices.begin(), choices.end(),
+                                 [](std::pair<const std::pair<std::pair<int, int>, std::pair<int, int>>, int> firstChoice,
+                                    std::pair<const std::pair<std::pair<int, int>, std::pair<int, int>>, int> secondChoice) -> bool {
+                                     return firstChoice.second < secondChoice.second;
+                                 });
 
-auto Game::findSelected() -> std::vector<int> {
-    auto newVector = std::vector<int>();
-
-    for (auto i = 0; i < mapBut.size(); i++)
-        for (auto j = 0; j < mapBut[i].size(); j++)
-            if (mapBut[i][j]->getText().getFillColor() == sf::Color::Green)
-                newVector.insert(newVector.end(), {i, j});
-
-    return newVector;
+    mapBut[best->first.first.first][best->first.first.second]->getText().setFillColor(sf::Color::Green);
+    checkMove(best->first.second.first, best->first.second.second);
 }
 
 auto Game::saveInFile(int player1, int player2) -> void {
@@ -468,13 +346,13 @@ auto Game::loadGame(const std::string &path) -> Game {
     auto line = std::string();
     auto turnFrom = false;
     auto modeFrom = false;
-    float varTime = 0.0;
+    auto varTime = 0.0;
 
     while (getline(file, line, '\n')) {
         auto tempVec = std::vector<int>();
         auto ss = std::istringstream(line);
 
-        while (ss >> line) {
+        while (ss >> line)
             if (line == "Time")
                 ss >> varTime;
             else if (line == "Mode")
@@ -483,7 +361,7 @@ auto Game::loadGame(const std::string &path) -> Game {
                 ss >> turnFrom;
             else
                 tempVec.push_back(stoi(line));
-        }
+
         newMapInt.emplace_back(tempVec);
     }
 
