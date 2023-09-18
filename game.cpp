@@ -75,8 +75,6 @@ auto Game::makeMove(sf::RenderWindow &window) -> void {
 auto Game::checkEnd() -> bool {
     if (counter(1) == "0" || counter(2) == "0" || counter(3) == "0")
         return true;
-    auto counter1 = 0;
-    auto counter2 = 0;
 
     for (auto y = 0; y < mapBut.size(); y++)
         for (auto x = 0; x < mapBut[y].size(); x++)
@@ -86,19 +84,12 @@ auto Game::checkEnd() -> bool {
                     auto newX = x + offset[1];
 
                     if (newX >= 0 && newY < mapBut.size() && newY >= 0 && newX < mapBut[newY].size()) {
-                        if (mapBut[newY][newX]->getText().getString() == "0")
+                        if (mapBut[newY][newX]->getText().getString() == "O")
                             return false;
-                        else if (mapBut[newY][newX]->getText().getString() == "2")
-                            counter1++;
-                        else if (mapBut[newY][newX]->getText().getString() == "1")
-                            counter2++;
                     }
                 }
 
-    if (counter1 == 0 || counter2 == 0)
-        return true;
-
-    return false;
+    return true;
 }
 
 auto Game::checkSelected() -> bool {
