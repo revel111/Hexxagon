@@ -16,6 +16,8 @@
 #include <ctime>
 #include <filesystem>
 
+using std::string, std::vector, std::pair, std::unique_ptr;
+
 class Game {
 public:
     /**
@@ -23,6 +25,8 @@ public:
     * @param mode
     */
     explicit Game(bool mode);
+
+    Game();
 
     /**
     * Constructor for creating game when user loads one.
@@ -183,7 +187,7 @@ private:
     };
 
     sf::Time timer = sf::seconds(0);
-    bool mode;
-    bool turn;
+    bool mode{};
+    bool turn{};
     std::vector<std::vector<std::unique_ptr<Button>>> mapBut;
 };

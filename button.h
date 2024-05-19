@@ -18,6 +18,8 @@ public:
     Button(const std::string &text, const sf::Vector2f &size, const int &charSize, const sf::Color &back,
            const sf::Vector2f &pos, const sf::Font &font, float width, float height);
 
+    Button();
+
     auto getText() -> sf::Text &;
 
     auto getButton() -> sf::RectangleShape &;
@@ -55,6 +57,8 @@ public:
      * @return void
      */
     auto colorButMenu(sf::RenderWindow &window) -> void;
+
+//    auto colorButtonGame(sf::Color& color) -> void;
 
 private:
     sf::RectangleShape button;

@@ -8,22 +8,24 @@ Button::Button(const std::string &text, const sf::Vector2f &size, const int &cha
     button.setSize(size);
     button.setFillColor(back);
     setPosition(pos, width, height);
-    getText().setFont(font);
+    this->text.setFont(font);
 }
 
-sf::Text &Button::getText() {
+Button::Button() = default;
+
+auto Button::getText() -> sf::Text & {
     return text;
 }
 
-sf::RectangleShape &Button::getButton() {
+auto Button::getButton() -> sf::RectangleShape & {
     return button;
 }
 
-sf::Color &Button::getDefColor() {
+auto Button::getDefColor() -> sf::Color & {
     return defColor;
 }
 
-void Button::setDefColor(const sf::Color &defColor) {
+auto Button::setDefColor(const sf::Color &defColor) -> void {
     this->defColor = defColor;
 }
 
@@ -58,11 +60,16 @@ auto Button::isMouseOver(sf::RenderWindow &window) -> bool {
 }
 
 auto Button::colorButMenu(sf::RenderWindow &window) -> void {
-    if (this->isMouseOver(window)) {
-        this->getButton().setFillColor(sf::Color::White);
-        this->getText().setFillColor(sf::Color(128, 128, 128));
+    if (isMouseOver(window)) {
+        button.setFillColor(sf::Color::White);
+        text.setFillColor(sf::Color(128, 128, 128));
     } else {
-        this->getButton().setFillColor(sf::Color(128, 128, 128));
-        this->getText().setFillColor(sf::Color::White);
+        button.setFillColor(sf::Color(128, 128, 128));
+        text.setFillColor(sf::Color::White);
     }
 }
+
+//auto Button::colorButtonGame(sf::Color &color) -> void {
+//    text.setFillColor(color);
+//    button.setOutlineColor(color);
+//}

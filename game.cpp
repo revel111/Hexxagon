@@ -5,14 +5,16 @@ Game::Game(bool mode) {
     turn = false;
 }
 
-Game::Game(const std::vector<std::vector<int>> &mapInt, bool mode, bool turn, const sf::Time &timer) {
+Game::Game(const vector<vector<int>> &mapInt, bool mode, bool turn, const sf::Time &timer) {
     this->mapInt = mapInt;
     this->mode = mode;
     this->turn = turn;
     this->timer = timer;
 }
 
-sf::Time &Game::getTimer() {
+Game::Game() = default;
+
+auto Game::getTimer() -> sf::Time & {
     return timer;
 }
 
@@ -29,10 +31,12 @@ auto Game::initializeMap(sf::RenderWindow &window, const sf::Font &font) -> void
 
     for (auto i = 0; i < mapInt.size(); i++) {
         auto currentStartX = startX + 140 - (35 * mapInt[i].size() - 1);
+
         for (auto j = 0; j < mapInt[i].size(); j++) {
             auto pos = sf::Vector2f{currentStartX + j * (50 * 1.5f),
                                     static_cast<float>(startY + i * (std::sqrt(3.0f) * 25) + 1)};
             auto button = std::make_unique<Button>("", sf::Vector2f(30, 30), 15, sf::Color::Black, pos, font, 4, 4);
+
             switch (mapInt[i][j]) {
                 case 0:
                     button->getText().setString("X");
@@ -54,6 +58,7 @@ auto Game::initializeMap(sf::RenderWindow &window, const sf::Font &font) -> void
                     button->setDefColor(sf::Color::Cyan);
                     break;
             }
+
             mapBut[i].push_back(std::move(button));
             mapBut[i][j]->drawBut(window);
         }
@@ -163,9 +168,11 @@ auto Game::checkMove(int y, int x) -> void {
             mapBut[y][x]->getText().setFillColor(sf::Color::Blue);
             mapBut[y][x]->setDefColor(sf::Color::Blue);
         }
+
         turn = !turn;
     } else
         mapBut[y][x]->getText().setFillColor(sf::Color::Red);
+
     disableColor(false);
 }
 
@@ -176,34 +183,37 @@ auto Game::colorPossible(int y, int x) -> void {
                 mapBut[i][j]->getText().setFillColor(sf::Color::Yellow);
 }
 
-auto Game::counter(int ch) -> std::string {
+
+auto Game::counter(int ch) -> string {
     auto count = 0;
 
     for (auto &i: mapBut)
-        for (const auto &j: i)
-            if ((j->getText().getString() == "1" && ch == 1) || (j->getText().getString() == "2" && ch == 2) ||
-                (j->getText().getString() == "O" && ch == 3))
+        for (const auto &j: i) {
+            string content = j->getText().getString();
+
+            if ((content == "1" && ch == 1) || (content == "2" && ch == 2) || (content == "O" && ch == 3))
                 count++;
+        }
 
     return std::to_string(count);
 }
 
 auto Game::aiMakeMove() -> void {
-    auto choices = std::map<std::pair<std::pair<int, int>, std::pair<int, int>>, int>();
-    auto selected = std::pair<int, int>();
-    auto available = std::pair<int, int>();
+    auto choices = std::map<pair<pair<int, int>,pair<int, int>>, int>();
+    auto selected = pair<int, int>();
+    auto available = pair<int, int>();
     auto counter = 0;
 
     for (auto selectedY = 0; selectedY < mapBut.size(); selectedY++)  // for searching friend pawns
         for (auto selectedX = 0; selectedX < mapBut[selectedY].size(); selectedX++) {
             if (mapBut[selectedY][selectedX]->getText().getString() == "2") {
-                selected = std::pair<int, int>(selectedY, selectedX);
+                selected = pair<int, int>(selectedY, selectedX);
 
                 for (auto availableY = 0; availableY < mapBut.size(); availableY++) // for searching available
                     for (auto availableX = 0; availableX < mapBut[availableY].size(); availableX++)
                         if (abs(selected.second - availableX) <= 2 && abs(selected.first - availableY) <= 4 &&
                             mapBut[availableY][availableX]->getText().getString() == "O") {
-                            available = std::pair<int, int>(availableY, availableX);
+                            available = pair<int, int>(availableY, availableX);
 
                             for (const auto &offset: offsetEnemy) { // for searching possible enemies
                                 auto newX = available.first + offset[0];
@@ -213,15 +223,15 @@ auto Game::aiMakeMove() -> void {
                                 if (newX >= 0 && newY < mapBut.size() && newY >= 0 && newX < mapBut[newY].size())
                                     counter++;
                             }
-                            choices.insert({std::pair<std::pair<int, int>, std::pair<int, int>>(selected, available),
+                            choices.insert({pair<pair<int, int>, pair<int, int>>(selected, available),
                                             counter});
                         }
             }
         }
 
     auto best = std::max_element(choices.begin(), choices.end(),
-                                 [](std::pair<const std::pair<std::pair<int, int>, std::pair<int, int>>, int> firstChoice,
-                                    std::pair<const std::pair<std::pair<int, int>, std::pair<int, int>>, int> secondChoice) -> bool {
+                                 [](pair<const pair<pair<int, int>,pair<int, int>>, int> firstChoice,
+                                    pair<const pair<pair<int, int>, pair<int, int>>, int> secondChoice) -> bool {
                                      return firstChoice.second < secondChoice.second;
                                  });
 
@@ -231,7 +241,7 @@ auto Game::aiMakeMove() -> void {
 
 auto Game::saveInFile(int player1, int player2) -> void {
     auto result = readFile();
-    auto results = std::vector<std::vector<int>>();
+    auto results = vector<vector<int>>();
     auto secondValue = true;
     auto putInFile = std::stringstream();
     auto file = std::ofstream("results.txt");
@@ -239,7 +249,7 @@ auto Game::saveInFile(int player1, int player2) -> void {
     auto pattern = std::regex(": (\\d+)");
     auto iss = std::istringstream(result);
     auto match = std::smatch();
-    auto line = std::string();
+    auto line = string();
 
     while (std::getline(iss, line))
         while (std::regex_search(line, match, pattern)) {
@@ -253,7 +263,7 @@ auto Game::saveInFile(int player1, int player2) -> void {
     results.back().push_back(player2);
 
     std::sort(results.begin(), results.end(),
-              [](const std::vector<int> &first, const std::vector<int> &second) -> bool {
+              [](const vector<int> &first, const vector<int> &second) -> bool {
                   auto nonNullA = 0, nonNullB = 0;
 
                   if (first[1] != 0)
@@ -276,10 +286,10 @@ auto Game::saveInFile(int player1, int player2) -> void {
     file.close();
 }
 
-auto Game::readFile() -> std::string {
+auto Game::readFile() -> string {
     auto file = std::ifstream("results.txt");
-    auto result = std::string();
-    auto line = std::string();
+    auto result = string();
+    auto line = string();
 
     while (getline(file, line))
         result += line + '\n';
@@ -328,19 +338,19 @@ auto Game::saveGame() -> void {
     file.close();
 }
 
-auto Game::loadGame(const std::string &path) -> Game {
+auto Game::loadGame(const string &path) -> Game {
     auto putInFile = std::stringstream();
     putInFile << "savings/" << path;
 
     auto file = std::ifstream(putInFile.str());
-    auto newMapInt = std::vector<std::vector<int>>();
-    auto line = std::string();
+    auto newMapInt = vector<vector<int>>();
+    auto line = string();
     auto turnFrom = false;
     auto modeFrom = false;
     auto varTime = 0.0;
 
     while (getline(file, line, '\n')) {
-        auto tempVec = std::vector<int>();
+        auto tempVec = vector<int>();
         auto ss = std::istringstream(line);
 
         while (ss >> line)
@@ -363,8 +373,8 @@ auto Game::loadGame(const std::string &path) -> Game {
     return {newMapInt, modeFrom, turnFrom, timeString};
 }
 
-auto Game::loadGameBut(const sf::Font &font) -> std::vector<std::unique_ptr<Button>> {
-    auto newVector = std::vector<std::unique_ptr<Button>>();
+auto Game::loadGameBut(const sf::Font &font) -> vector<unique_ptr<Button>> {
+    auto newVector = vector<unique_ptr<Button>>();
     auto pos = sf::Vector2f{500, 150};
 
     for (const auto &entry: std::filesystem::directory_iterator("savings")) {
