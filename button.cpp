@@ -1,24 +1,29 @@
 #include "button.h"
 
-Button::Button(const std::string &text, const sf::Vector2f &size, const int &charSize, const sf::Color &back,
-               const sf::Vector2f &pos, const sf::Font &font, float width, float height) {
+Button::Button(const std::string &text, const float &radius, const int &charSize, const sf::Color &back,
+               const sf::Vector2f &pos, const sf::Font &font, int angles) {
     this->text.setString(text);
     this->text.setFillColor(sf::Color::White);
     this->text.setCharacterSize(charSize);
-    button.setSize(size);
-    button.setFillColor(back);
-    setPosition(pos, width, height);
     this->text.setFont(font);
+
+    button.setRadius(radius);
+    button.setPointCount(angles);
+    button.setFillColor(back);
+    button.setOutlineThickness(2.0f);
+    button.setOutlineColor(sf::Color::Red);
+    button.setPosition(pos);
+
+    if (angles == 4)
+        button.setRotation(45);
+
+    centralizeText();
 }
 
 Button::Button() = default;
 
 auto Button::getText() -> sf::Text & {
     return text;
-}
-
-auto Button::getButton() -> sf::RectangleShape & {
-    return button;
 }
 
 auto Button::getDefColor() -> sf::Color & {
@@ -67,6 +72,17 @@ auto Button::colorButMenu(sf::RenderWindow &window) -> void {
         button.setFillColor(sf::Color(128, 128, 128));
         text.setFillColor(sf::Color::White);
     }
+}
+
+auto Button::centralizeText() -> void {
+    sf::FloatRect buttonBounds = button.getGlobalBounds();
+    sf::FloatRect textBounds = text.getLocalBounds();
+
+    float xCenter = buttonBounds.left + (buttonBounds.width / 2.0f);
+    float yCenter = buttonBounds.top + (buttonBounds.height / 2.0f);
+
+    text.setOrigin(textBounds.left + textBounds.width / 2.0f, textBounds.top + textBounds.height / 2.0f);
+    text.setPosition(xCenter, yCenter);
 }
 
 //auto Button::colorButtonGame(sf::Color &color) -> void {

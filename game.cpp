@@ -26,16 +26,19 @@ auto Game::initializeMap(sf::RenderWindow &window, const sf::Font &font) -> void
         if (row.size() > maxColumns)
             maxColumns = row.size();
 
-    auto startX = (1200 - (50 * 1.5f) * maxColumns) / 2;
-    auto startY = (800 - (std::sqrt(3.0f) * 25) * (mapInt.size() + 0.5)) / 2;
+    auto buttonRadius = 30.0f;
+    auto buttonSpacingX = buttonRadius * 1.75f;
+    auto buttonSpacingY = buttonRadius * 1.48f;
+
+    auto startX = (1200 - buttonSpacingX * maxColumns) / 2;
+    auto startY = (800 - buttonSpacingY * (mapInt.size() + 0.5)) / 2;
 
     for (auto i = 0; i < mapInt.size(); i++) {
-        auto currentStartX = startX + 140 - (35 * mapInt[i].size() - 1);
+        auto currentStartX = startX + (buttonSpacingX / 2) * (maxColumns - mapInt[i].size());
 
         for (auto j = 0; j < mapInt[i].size(); j++) {
-            auto pos = sf::Vector2f{currentStartX + j * (50 * 1.5f),
-                                    static_cast<float>(startY + i * (std::sqrt(3.0f) * 25) + 1)};
-            auto button = std::make_unique<Button>("", sf::Vector2f(30, 30), 15, sf::Color::Black, pos, font, 4, 4);
+            auto pos = sf::Vector2f{currentStartX + j * buttonSpacingX, static_cast<float>(startY + i * buttonSpacingY)};
+            auto button = std::make_unique<Button>("", buttonRadius, 10, sf::Color::Black, pos, font, 6);
 
             switch (mapInt[i][j]) {
                 case 0:
@@ -108,7 +111,8 @@ auto Game::checkSelected() -> bool {
 
 auto Game::colorButGame(sf::RenderWindow &window, int y, int x) -> void {
     if (!mode || (mode && !turn)) {
-        if (mapBut[y][x]->isMouseOver(window) && checkSelected())
+        if (mapBut[y]
+            [x]->isMouseOver(window) && checkSelected())
             if (mapBut[y][x]->getText().getFillColor() == sf::Color::Green) {
                 mapBut[y][x]->getText().setFillColor(mapBut[y][x]->getDefColor());
                 disableColor(false);
@@ -183,7 +187,6 @@ auto Game::colorPossible(int y, int x) -> void {
                 mapBut[i][j]->getText().setFillColor(sf::Color::Yellow);
 }
 
-
 auto Game::counter(int ch) -> string {
     auto count = 0;
 
@@ -199,7 +202,7 @@ auto Game::counter(int ch) -> string {
 }
 
 auto Game::aiMakeMove() -> void {
-    auto choices = std::map<pair<pair<int, int>,pair<int, int>>, int>();
+    auto choices = std::map<pair<pair<int, int>, pair<int, int>>, int>();
     auto selected = pair<int, int>();
     auto available = pair<int, int>();
     auto counter = 0;
@@ -230,7 +233,7 @@ auto Game::aiMakeMove() -> void {
         }
 
     auto best = std::max_element(choices.begin(), choices.end(),
-                                 [](pair<const pair<pair<int, int>,pair<int, int>>, int> firstChoice,
+                                 [](pair<const pair<pair<int, int>, pair<int, int>>, int> firstChoice,
                                     pair<const pair<pair<int, int>, pair<int, int>>, int> secondChoice) -> bool {
                                      return firstChoice.second < secondChoice.second;
                                  });
@@ -374,21 +377,20 @@ auto Game::loadGame(const string &path) -> Game {
 }
 
 auto Game::loadGameBut(const sf::Font &font) -> vector<unique_ptr<Button>> {
-    auto newVector = vector<unique_ptr<Button>>();
-    auto pos = sf::Vector2f{500, 150};
+    auto newVector = vector<unique_ptr<Button >>();
+    auto pos = sf::Vector2f{570, 100};
 
     for (const auto &entry: std::filesystem::directory_iterator("savings")) {
-        auto button = std::make_unique<Button>(entry.path().filename().string(), sf::Vector2f(225, 50), 20,
-                                               sf::Color(128, 128, 128), pos, font, 10, 3);
+        auto button = std::make_unique<Button>(entry.path().filename().string(), 70, 13, sf::Color(128, 128, 128), pos,
+                                               font, 4);
         newVector.push_back(std::move(button));
-        pos.y += 75;
+        pos.y += 110;
     }
 
-    while (newVector.size() < 7) {
-        auto button = std::make_unique<Button>("Empty", sf::Vector2f(225, 50), 20,
-                                               sf::Color(128, 128, 128), pos, font, 10, 3);
+    while (newVector.size() < 6) {
+        auto button = std::make_unique<Button>("Empty", 70, 13, sf::Color(128, 128, 128), pos, font, 4);
         newVector.push_back(std::move(button));
-        pos.y += 75;
+        pos.y += 110;
     }
 
     return newVector;

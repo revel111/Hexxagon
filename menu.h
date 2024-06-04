@@ -29,7 +29,7 @@ private:
     sf::Texture backgroundIm;
     sf::Clock clock;
     Game game;
-    // buttons
+    //Buttons
     Button newGame;
     Button loadGame;
     Button highScores;
@@ -41,7 +41,7 @@ private:
     Button gameOver;
     Button saveGame;
     Button deleteGame;
-    //
+    //To load
     sf::Font font;
     sf::Image icon;
     //Text

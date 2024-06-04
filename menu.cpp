@@ -199,17 +199,17 @@ auto Menu::renderState() -> void {
 }
 
 auto Menu::initializeButtons() -> void {
-    newGame = Button("New Game", {125, 65}, 20, sf::Color(128, 128, 128), {300, 300}, font, 10, 3);
-    loadGame = Button("Load Game", {125, 65}, 20, sf::Color(128, 128, 128), {500, 300}, font, 10, 3);
-    highScores = Button("High Scores", {125, 65}, 20, sf::Color(128, 128, 128), {700, 300}, font, 10, 3);
-    exit = Button("Exit", {125, 65}, 20, sf::Color(128, 128, 128), {900, 300}, font, 3, 3);
-    computerVsPlayer = Button("Computer vs Player", {225, 65}, 20, sf::Color(128, 128, 128), {750, 300}, font, 10, 3);
-    playerVsPlayer = Button("Player vs Player", {225, 65}, 20, sf::Color(128, 128, 128), {300, 300}, font, 6, 3);
-    player1 = Button("0", {50, 50}, 20, sf::Color::Blue, {1100, 550}, font, 3, 4);
-    player2 = Button("0", {50, 50}, 20, sf::Color::Cyan, {1100, 600}, font, 3, 4);
-    gameOver = Button("Game over!", {200, 100}, 17, sf::Color(128, 128, 128), {500, 300}, font, 5, 10);
-    saveGame = Button("Save Game", {100, 50}, 17, sf::Color(128, 128, 128), {1075, 700}, font, 10, 3);
-    deleteGame = Button("Delete Game", {125, 50}, 17, sf::Color(128, 128, 128), {1000, 700}, font, 10, 3);
+    newGame = Button("New Game", 75, 20, sf::Color(128, 128, 128), {300, 300}, font, 4);
+    loadGame = Button("Load Game", 75, 20, sf::Color(128, 128, 128), {500, 300}, font, 4);
+    highScores = Button("High Scores", 75, 20, sf::Color(128, 128, 128), {700, 300}, font, 4);
+    exit = Button("Exit", 75, 20, sf::Color(128, 128, 128), {900, 300}, font, 4);
+    playerVsPlayer = Button("Player vs Player", 100, 15, sf::Color(128, 128, 128), {400, 300}, font, 4);
+    computerVsPlayer = Button("Computer vs Player", 100, 15, sf::Color(128, 128, 128), {750, 300}, font, 4);
+    player1 = Button("0", 25, 20, sf::Color::Blue, {1100, 550}, font, 4);
+    player2 = Button("0", 25, 20, sf::Color::Cyan, {1100, 600}, font, 4);
+    gameOver = Button("Game over!", 40, 17, sf::Color(128, 128, 128), {500, 300}, font, 4);
+    saveGame = Button("Save Game", 57, 17, sf::Color(128, 128, 128), {1100, 650}, font, 4);
+    deleteGame = Button("Delete Game", 70, 15, sf::Color(128, 128, 128), {1000, 600}, font, 4);
 }
 
 auto Menu::loader() -> void {
@@ -224,15 +224,14 @@ auto Menu::loader() -> void {
 auto Menu::initializeText() -> void {
     timerText = sf::Text("", font, 20);
     scoreText = sf::Text("", font);
-    loadGameText = sf::Text("Load Game", font, 25);
-    saveGameText = sf::Text("Choose slot to overwrite", font, 23);
-    deleteGameText = sf::Text("Choose slot to delete", font, 25);
+    loadGameText = sf::Text("Load Game", font, 22);
+    saveGameText = sf::Text("Choose slot to overwrite", font, 22);
+    deleteGameText = sf::Text("Choose slot to delete", font, 22);
 
-    loadGameText.setPosition(550, 100);
+    loadGameText.setPosition(500, 50);
     saveGameText.setPosition(485, 100);
     deleteGameText.setPosition(500, 100);
     scoreText.setPosition(450, 250);
-    timerText.setPosition(1090, 510);
+    timerText.setPosition(1060, 510);
     timerText.setFillColor(sf::Color::White);
 }
-
