@@ -72,7 +72,7 @@ auto Menu::renderEvent(sf::Event event) -> void {
                     if (saveGame.isMouseOver(window))
                         currentState = GameState::inSaveGame;
                     else
-                        game.makeMove(window);
+                        game.colorGameButtons(window);
                     break;
                 case GameState::inMode:
                     if (computerVsPlayer.isMouseOver(window)) {
@@ -167,12 +167,13 @@ auto Menu::renderState() -> void {
             window.draw(scoreText);
             break;
         case GameState::inGame:
+            window.draw(background);
             if (first) {
                 game.initializeMap(window, font);
                 first = false;
                 game.getTimer() = sf::seconds(0);
                 clock.restart();
-            } else if (game.checkEnd()) {
+            } else if (game.isEnd()) {
                 auto result = std::stringstream();
                 result << "    Game over!\n     Player 1: " << game.counter(1) << "\n     Player 2: "
                        << game.counter(2)
@@ -199,16 +200,16 @@ auto Menu::renderState() -> void {
 }
 
 auto Menu::initializeButtons() -> void {
-    newGame = Button("New Game", 75, 20, sf::Color(128, 128, 128), {300, 300}, font, 4);
-    loadGame = Button("Load Game", 75, 20, sf::Color(128, 128, 128), {500, 300}, font, 4);
-    highScores = Button("High Scores", 75, 20, sf::Color(128, 128, 128), {700, 300}, font, 4);
+    newGame = Button("New Game", 77, 20, sf::Color(128, 128, 128), {300, 300}, font, 4);
+    loadGame = Button("Load Game", 77, 20, sf::Color(128, 128, 128), {500, 300}, font, 4);
+    highScores = Button("High Scores", 77, 20, sf::Color(128, 128, 128), {700, 300}, font, 4);
     exit = Button("Exit", 75, 20, sf::Color(128, 128, 128), {900, 300}, font, 4);
     playerVsPlayer = Button("Player vs Player", 100, 15, sf::Color(128, 128, 128), {400, 300}, font, 4);
     computerVsPlayer = Button("Computer vs Player", 100, 15, sf::Color(128, 128, 128), {750, 300}, font, 4);
     player1 = Button("0", 25, 20, sf::Color::Blue, {1100, 550}, font, 4);
     player2 = Button("0", 25, 20, sf::Color::Cyan, {1100, 600}, font, 4);
     gameOver = Button("Game over!", 40, 17, sf::Color(128, 128, 128), {500, 300}, font, 4);
-    saveGame = Button("Save Game", 57, 17, sf::Color(128, 128, 128), {1100, 650}, font, 4);
+    saveGame = Button("Save Game", 63, 17, sf::Color(128, 128, 128), {1100, 650}, font, 4);
     deleteGame = Button("Delete Game", 70, 15, sf::Color(128, 128, 128), {1000, 600}, font, 4);
 }
 

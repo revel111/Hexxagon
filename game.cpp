@@ -19,31 +19,45 @@ auto Game::getTimer() -> sf::Time & {
 }
 
 auto Game::initializeMap(sf::RenderWindow &window, const sf::Font &font) -> void {
-    mapBut.resize(mapInt.size());
-    auto maxColumns = 0;
+    mapHex.resize(mapInt.size());
+    int maxColumns = 0;
 
     for (const auto &row: mapInt)
         if (row.size() > maxColumns)
             maxColumns = row.size();
 
-    auto buttonRadius = 30.0f;
-    auto buttonSpacingX = buttonRadius * 1.75f;
-    auto buttonSpacingY = buttonRadius * 1.48f;
+    float buttonRadius = 30.0f;
+    float buttonSpacingX = buttonRadius * 1.75f;
+    float buttonSpacingY = buttonRadius * 1.48f;
 
-    auto startX = (1200 - buttonSpacingX * maxColumns) / 2;
-    auto startY = (800 - buttonSpacingY * (mapInt.size() + 0.5)) / 2;
+    float startX = (1200 - buttonSpacingX * maxColumns) / 2;
+    float startY = (800 - buttonSpacingY * (mapInt.size() + 0.5)) / 2;
 
-    for (auto i = 0; i < mapInt.size(); i++) {
-        auto currentStartX = startX + (buttonSpacingX / 2) * (maxColumns - mapInt[i].size());
+    int N = mapInt.size() / 2;
 
-        for (auto j = 0; j < mapInt[i].size(); j++) {
-            auto pos = sf::Vector2f{currentStartX + j * buttonSpacingX, static_cast<float>(startY + i * buttonSpacingY)};
+    for (int q = -N; q <= N; ++q) {
+        int r1 = std::max(-N, -q - N);
+        int r2 = std::min(N, -q + N);
+        for (int r = r1; r <= r2; ++r) {
+
+            int rowIndex = r + N;
+            if (rowIndex < 0 || rowIndex >= mapInt.size()) continue;
+
+            int colIndex = q + (mapInt[rowIndex].size() - 1) / 2;
+            if (colIndex < 0 || colIndex >= mapInt[rowIndex].size()) continue;
+
+            float currentStartX = startX + (buttonSpacingX / 2) * (maxColumns - mapInt[rowIndex].size());
+            float posX = currentStartX + colIndex * buttonSpacingX;
+            float posY = startY + rowIndex * buttonSpacingY;
+
+            sf::Vector2f pos{posX, posY};
             auto button = std::make_unique<Button>("", buttonRadius, 10, sf::Color::Black, pos, font, 6);
 
-            switch (mapInt[i][j]) {
+            int mapValue = mapInt[rowIndex][colIndex];
+
+            switch (mapValue) {
                 case 0:
                     button->getText().setString("X");
-                    button->getText().setFillColor(sf::Color(128, 128, 128));
                     button->setDefColor(sf::Color(128, 128, 128));
                     break;
                 case 1:
@@ -52,58 +66,56 @@ auto Game::initializeMap(sf::RenderWindow &window, const sf::Font &font) -> void
                     break;
                 case 2:
                     button->getText().setString("1");
-                    button->getText().setFillColor(sf::Color::Blue);
                     button->setDefColor(sf::Color::Blue);
                     break;
                 case 3:
                     button->getText().setString("2");
-                    button->getText().setFillColor(sf::Color::Cyan);
                     button->setDefColor(sf::Color::Cyan);
                     break;
             }
 
-            mapBut[i].push_back(std::move(button));
-            mapBut[i][j]->drawBut(window);
+            button->colorDefault();
+
+            if (mapHex[rowIndex].size() <= colIndex)
+                mapHex[rowIndex].resize(colIndex + 1);
+
+            mapHex[rowIndex][colIndex] = std::make_unique<Hex>(q, r, -q - r, button);
+            mapHex[rowIndex][colIndex]->getButton()->drawBut(window);
         }
     }
 }
 
 auto Game::drawMap(sf::RenderWindow &window) -> void {
-    for (auto &i: mapBut)
+    for (auto &i: mapHex)
         for (const auto &j: i)
-            j->drawBut(window);
+            j->getButton()->drawBut(window);
 }
 
-auto Game::makeMove(sf::RenderWindow &window) -> void {
-    for (auto i = 0; i < mapBut.size(); i++)
-        for (auto j = 0; j < mapBut[i].size(); j++)
+auto Game::colorGameButtons(sf::RenderWindow &window) -> void {
+    for (auto i = 0; i < mapHex.size(); i++)
+        for (auto j = 0; j < mapHex[i].size(); j++)
             colorButGame(window, i, j);
 }
 
-auto Game::checkEnd() -> bool {
+auto Game::isEnd() -> bool {
     if (counter(1) == "0" || counter(2) == "0" || counter(3) == "0")
         return true;
 
-    for (auto y = 0; y < mapBut.size(); y++)
-        for (auto x = 0; x < mapBut[y].size(); x++)
-            if (mapBut[y][x]->getText().getString() == "1" || mapBut[y][x]->getText().getString() == "2")
-                for (const auto &offset: offsetEnemy) {
-                    auto newY = y + offset[0];
-                    auto newX = x + offset[1];
+//    for (auto y = 0; y < mapHex.size(); y++)
+//        for (auto x = 0; x < mapHex[y].size(); x++)
+//            if (mapHex[y][x]->getButton()->getTextString() == "1" ||
+//                mapHex[y][x]->getButton()->getTextString() == "2")
+//                for (auto position: getValidPositions(y, x, 2))
+//                    if (mapHex[position.first][position.second]->getButton()->getTextString() == "O")
+//                        return false;
 
-                    if (newX >= 0 && newY < mapBut.size() && newY >= 0 && newX < mapBut[newY].size()) {
-                        if (mapBut[newY][newX]->getText().getString() == "O")
-                            return false;
-                    }
-                }
-
-    return true;
+    return false;
 }
 
 auto Game::checkSelected() -> bool {
-    for (auto &i: mapBut)
+    for (auto &i: mapHex)
         for (const auto &j: i)
-            if (j->getText().getFillColor() == sf::Color::Green)
+            if (j->getButton()->getText().getFillColor() == sf::Color::Green)
                 return true;
 
     return false;
@@ -111,90 +123,88 @@ auto Game::checkSelected() -> bool {
 
 auto Game::colorButGame(sf::RenderWindow &window, int y, int x) -> void {
     if (!mode || (mode && !turn)) {
-        if (mapBut[y]
-            [x]->isMouseOver(window) && checkSelected())
-            if (mapBut[y][x]->getText().getFillColor() == sf::Color::Green) {
-                mapBut[y][x]->getText().setFillColor(mapBut[y][x]->getDefColor());
-                disableColor(false);
+        sf::Text &text = mapHex[y][x]->getButton()->getText();
+
+        if (mapHex[y][x]->getButton()->isMouseOver(window) && checkSelected())
+            if (text.getFillColor() == sf::Color::Green) {
+                mapHex[y][x]->getButton()->colorDefault();
+                disableColor(sf::Color::Yellow);
             } else
-                checkMove(y, x);
-        else if (mapBut[y][x]->isMouseOver(window))
-            if ((turn && mapBut[y][x]->getText().getString() == "2") ||
-                (!turn && mapBut[y][x]->getText().getString() == "1")) {
-                mapBut[y][x]->getText().setFillColor(sf::Color::Green);
-                disableColor(true);
+                makeMove(y, x);
+        else if (mapHex[y][x]->getButton()->isMouseOver(window)) {
+            auto textString = mapHex[y][x]->getButton()->getTextString();
+
+            if ((turn && textString == "2") || (!turn && textString == "1")) {
+                mapHex[y][x]->getButton()->color(sf::Color::Green);
+                disableColor(sf::Color::Red);
                 colorPossible(y, x);
             }
+        }
     } else if (mode && turn)
         aiMakeMove();
 }
 
-auto Game::checkMove(int y, int x) -> void {
-    auto selectedX = 0, selectedY = 0;
+auto Game::makeMove(int y, int x) -> void {
+    auto selected = disableColor(sf::Color::Green);
 
-    for (auto i = 0; i < mapBut.size(); i++)
-        for (auto j = 0; j < mapBut[i].size(); j++)
-            if (mapBut[i][j]->getText().getFillColor() == sf::Color::Green) {
-                selectedX = j, selectedY = i;
-                mapBut[selectedY][selectedX]->getText().setFillColor(mapBut[selectedY][selectedX]->getDefColor());
+    if (/*canMove(selected.first, selected.second, y, x) &&*/
+            mapHex[y][x]->getButton()->getText().getFillColor() == sf::Color::Yellow) {
+//        auto validMoves = getValidPositions(selected.first, selected.second, 1);
+//        auto validMoves = getValidPositions(selectedY, selectedX);
+
+        for (auto position: findEnemies(selected))
+            if (mapHex[position.first][position.second]->getButton()->getTextString() == "2" && !turn) {
+                mapHex[position.first][position.second]->getButton()->getText().setString("1");
+                mapHex[position.first][position.second]->getButton()->setDefColor(sf::Color::Blue);
+                mapHex[position.first][position.second]->getButton()->colorDefault();
+            } else if (mapHex[position.first][position.second]->getButton()->getTextString() == "1" && turn) {
+                mapHex[position.first][position.second]->getButton()->getText().setString("2");
+                mapHex[position.first][position.second]->getButton()->setDefColor(sf::Color::Cyan);
+                mapHex[position.first][position.second]->getButton()->colorDefault();
             }
-
-    if (abs(selectedX - x) <= 2 && abs(selectedY - y) <= 4 && mapBut[y][x]->getText().getString() == "O") {
-        if ((abs(selectedX - x) == 2) || ((abs(selectedY - y)) == 4) || ((abs(selectedY - y)) == 3)) {
-            mapBut[selectedY][selectedX]->getText().setString("O");
-            mapBut[selectedY][selectedX]->setDefColor(sf::Color::White);
-            mapBut[selectedY][selectedX]->getText().setFillColor(sf::Color::White);
-        }
-
-        for (const auto &offset: offsetEnemy) {
-            auto newY = y + offset[0];
-            auto newX = x + offset[1];
-
-            if (newX >= 0 && newY < mapBut.size() && newY >= 0 && newX < mapBut[newY].size()) {
-                if (mapBut[newY][newX]->getText().getString() == "2" && !turn) {
-                    mapBut[newY][newX]->getText().setString("1");
-                    mapBut[newY][newX]->setDefColor(sf::Color::Blue);
-                    mapBut[newY][newX]->getText().setFillColor(sf::Color::Blue);
-                } else if (mapBut[newY][newX]->getText().getString() == "1" && turn) {
-                    mapBut[newY][newX]->getText().setString("2");
-                    mapBut[newY][newX]->setDefColor(sf::Color::Cyan);
-                    mapBut[newY][newX]->getText().setFillColor(sf::Color::Cyan);
-                }
-            }
-        }
 
         if (turn) {
-            mapBut[y][x]->getText().setString("2");
-            mapBut[y][x]->getText().setFillColor(sf::Color::Cyan);
-            mapBut[y][x]->setDefColor(sf::Color::Cyan);
+            mapHex[y][x]->getButton()->getText().setString("2");
+            mapHex[y][x]->getButton()->setDefColor(sf::Color::Cyan);
+            mapHex[y][x]->getButton()->colorDefault();
         } else {
-            mapBut[y][x]->getText().setString("1");
-            mapBut[y][x]->getText().setFillColor(sf::Color::Blue);
-            mapBut[y][x]->setDefColor(sf::Color::Blue);
+            mapHex[y][x]->getButton()->getText().setString("1");
+            mapHex[y][x]->getButton()->setDefColor(sf::Color::Blue);
+            mapHex[y][x]->getButton()->colorDefault();
+        }
+
+        if (canMove(selected.first, selected.second, y, x) == 2) {
+            mapHex[selected.first][selected.second]->getButton()->getText().setString("O");
+            mapHex[selected.first][selected.second]->getButton()->setDefColor(sf::Color::White);
+            mapHex[selected.first][selected.second]->getButton()->colorDefault();
         }
 
         turn = !turn;
     } else
-        mapBut[y][x]->getText().setFillColor(sf::Color::Red);
+        mapHex[y][x]->getButton()->color(sf::Color::Red);
 
-    disableColor(false);
+    disableColor(sf::Color::Yellow);
 }
 
 auto Game::colorPossible(int y, int x) -> void {
-    for (auto i = 0; i < mapBut.size(); i++)
-        for (auto j = 0; j < mapBut[i].size(); j++)
-            if (abs(x - j) <= 2 && abs(y - i) <= 4 && mapBut[i][j]->getText().getString() == "O")
-                mapBut[i][j]->getText().setFillColor(sf::Color::Yellow);
+//    auto validMoves = getValidPositions(y, x, 2);
+//    auto validMoves = getValidPositions(y, x);
+
+    for (auto pair: getValidPositions(y, x, 2))
+        if (mapHex[pair.first][pair.second]->getButton()->getTextString() == "O")
+            mapHex[pair.first][pair.second]->getButton()->color(sf::Color::Yellow);
 }
 
 auto Game::counter(int ch) -> string {
     auto count = 0;
 
-    for (auto &i: mapBut)
+    for (auto &i: mapHex)
         for (const auto &j: i) {
-            string content = j->getText().getString();
+            auto content = j->getButton()->getTextString();
 
-            if ((content == "1" && ch == 1) || (content == "2" && ch == 2) || (content == "O" && ch == 3))
+            if ((content == "1" && ch == 1) ||
+                (content == "2" && ch == 2) ||
+                (content == "O" && ch == 3))
                 count++;
         }
 
@@ -203,32 +213,24 @@ auto Game::counter(int ch) -> string {
 
 auto Game::aiMakeMove() -> void {
     auto choices = std::map<pair<pair<int, int>, pair<int, int>>, int>();
-    auto selected = pair<int, int>();
+    auto friendly = pair<int, int>();
     auto available = pair<int, int>();
-    auto counter = 0;
 
-    for (auto selectedY = 0; selectedY < mapBut.size(); selectedY++)  // for searching friend pawns
-        for (auto selectedX = 0; selectedX < mapBut[selectedY].size(); selectedX++) {
-            if (mapBut[selectedY][selectedX]->getText().getString() == "2") {
-                selected = pair<int, int>(selectedY, selectedX);
+    for (auto friendY = 0; friendY < mapHex.size(); friendY++)
+        for (auto friendX = 0; friendX < mapHex[friendY].size(); friendX++) {
+            if (mapHex[friendY][friendX]->getButton()->getText().getString() == "2") {
+                friendly = pair<int, int>(friendY, friendX);
 
-                for (auto availableY = 0; availableY < mapBut.size(); availableY++) // for searching available
-                    for (auto availableX = 0; availableX < mapBut[availableY].size(); availableX++)
-                        if (abs(selected.second - availableX) <= 2 && abs(selected.first - availableY) <= 4 &&
-                            mapBut[availableY][availableX]->getText().getString() == "O") {
-                            available = pair<int, int>(availableY, availableX);
+                auto validMoves = getValidPositions(friendY, friendX, 2);
 
-                            for (const auto &offset: offsetEnemy) { // for searching possible enemies
-                                auto newX = available.first + offset[0];
-                                auto newY = available.second + offset[1];
-                                counter = 0;
+                for (auto validMove: validMoves)
+                    if (mapHex[validMove.first][validMove.second]->getButton()->getTextString() == "O") {
+                        available = pair<int, int>(validMove.first, validMove.second);
 
-                                if (newX >= 0 && newY < mapBut.size() && newY >= 0 && newX < mapBut[newY].size())
-                                    counter++;
-                            }
-                            choices.insert({pair<pair<int, int>, pair<int, int>>(selected, available),
-                                            counter});
-                        }
+                        auto enemies = findEnemies(available);
+                        choices.insert({pair<pair<int, int>, pair<int, int>>(friendly, available),
+                                        enemies.size()});
+                    }
             }
         }
 
@@ -238,9 +240,10 @@ auto Game::aiMakeMove() -> void {
                                      return firstChoice.second < secondChoice.second;
                                  });
 
-    mapBut[best->first.first.first][best->first.first.second]->getText().setFillColor(sf::Color::Green);
-    checkMove(best->first.second.first, best->first.second.second);
+    mapHex[best->first.first.first][best->first.first.second]->getButton()->color(sf::Color::Green);
+    makeMove(best->first.second.first, best->first.second.second);
 }
+
 
 auto Game::saveInFile(int player1, int player2) -> void {
     auto result = readFile();
@@ -302,14 +305,17 @@ auto Game::readFile() -> string {
     return result;
 }
 
-auto Game::disableColor(bool ch) -> void {
-    for (auto &i: mapBut)
-        for (const auto &j: i)
-            if (j->getText().getFillColor() == sf::Color::Red && ch) {
-                j->getText().setFillColor(j->getDefColor());
-                break;
-            } else if (j->getText().getFillColor() == sf::Color::Yellow && !ch)
-                j->getText().setFillColor(j->getDefColor());
+auto Game::disableColor(const sf::Color &colorChange) -> pair<int, int> {
+    auto selected = pair<int, int>();
+
+    for (int i = 0; i < mapHex.size(); i++)
+        for (int j = 0; j < mapHex[i].size(); j++)
+            if (mapHex[i][j]->getButton()->getText().getFillColor() == colorChange) {
+                mapHex[i][j]->getButton()->colorDefault();
+                selected = {i, j};
+            }
+
+    return selected;
 }
 
 auto Game::saveGame() -> void {
@@ -323,16 +329,19 @@ auto Game::saveGame() -> void {
 
     auto file = std::ofstream(putInFile.str());
 
-    for (auto &i: mapBut) {
-        for (const auto &j: i)
-            if (j->getText().getString() == 'X')
+    for (auto &i: mapHex) {
+        for (const auto &j: i) {
+            auto text = j->getButton()->getText().getString();
+
+            if (text == "X")
                 file << "0 ";
-            else if (j->getText().getString() == 'O')
+            else if (text == "O")
                 file << "1 ";
-            else if (j->getText().getString() == '1')
+            else if (text == "1")
                 file << "2 ";
-            else if (j->getText().getString() == '2')
+            else if (text == "2")
                 file << "3 ";
+        }
         file << '\n';
     }
 
@@ -378,7 +387,7 @@ auto Game::loadGame(const string &path) -> Game {
 
 auto Game::loadGameBut(const sf::Font &font) -> vector<unique_ptr<Button>> {
     auto newVector = vector<unique_ptr<Button >>();
-    auto pos = sf::Vector2f{570, 100};
+    auto pos = sf::Vector2f{570, 80};
 
     for (const auto &entry: std::filesystem::directory_iterator("savings")) {
         auto button = std::make_unique<Button>(entry.path().filename().string(), 70, 13, sf::Color(128, 128, 128), pos,
@@ -394,4 +403,65 @@ auto Game::loadGameBut(const sf::Font &font) -> vector<unique_ptr<Button>> {
     }
 
     return newVector;
+}
+
+//auto Game::getValidPositions(int y, int x) -> vector<pair<int, int>> {
+//    auto validMoves = vector<pair<int, int>>();
+//
+//    for (auto i = 0; i < mapHex.size(); i++)
+//        for (auto j = 0; j < mapHex[i].size(); j++)
+//            if (canMove(i, j, y, x))
+//                validMoves.emplace_back(i, j);
+//
+//    return validMoves;
+//}
+
+//auto Game::find(int q, int r, int s) -> pair<int, int> {
+auto Game::find(vector<int> coordinates) -> pair<int, int> {
+    for (int i = 0; i < mapHex.size(); i++)
+        for (int j = 0; j < mapHex[i].size(); j++)
+            if (mapHex[i][j]->getQ() == coordinates[0] &&
+                mapHex[i][j]->getR() == coordinates[1] &&
+                mapHex[i][j]->getS() == coordinates[2])
+                return {i, j};
+
+    return {-1, -1};
+}
+
+auto Game::getValidPositions(int y, int x, int range) -> vector<pair<int, int>> {
+    auto validMoves = vector<pair<int, int>>();
+
+    for (int q = -range; q <= range; q++)
+        for (int r = std::max(-range, -q - range); r <= std::min(range, -q + range); r++) {
+            auto pair = find(mapHex[y][x]->add({q, r, -q - r}));
+
+            if (pair.first != -1 && pair.second != -1)
+                validMoves.push_back(pair);
+        }
+
+//    for (int i = 0; i < mapHex.size(); i++)
+//        for (int j = 0; j < mapHex[i].size(); j++) {
+//            auto distance = canMove(y, x, i, j);
+//            if ((range == 2 && (distance == 1 || distance == 2)) ||
+//                (range == 1 && distance == 1))
+//                validMoves.emplace_back(i, j);
+//        }
+
+    return validMoves;
+}
+
+auto Game::canMove(int y1, int x1, int y2, int x2) -> int {
+//    auto distance = mapHex[y1][x1]->getDistance(mapHex[y2][x2]);
+    return mapHex[y1][x1]->getDistance(mapHex[y2][x2]);
+}
+
+auto Game::findEnemies(pair<int, int> selected) -> vector<pair<int, int>> {
+    auto enemies = vector<pair<int, int>>();
+
+    for (auto position: getValidPositions(selected.first, selected.second, 1))
+        if (mapHex[position.first][position.second]->getButton()->getTextString() == "2" && !turn ||
+            mapHex[position.first][position.second]->getButton()->getTextString() == "1" && turn)
+            enemies.push_back(position);
+
+    return enemies;
 }

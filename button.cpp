@@ -11,7 +11,6 @@ Button::Button(const std::string &text, const float &radius, const int &charSize
     button.setPointCount(angles);
     button.setFillColor(back);
     button.setOutlineThickness(2.0f);
-    button.setOutlineColor(sf::Color::Red);
     button.setPosition(pos);
 
     if (angles == 4)
@@ -26,24 +25,24 @@ auto Button::getText() -> sf::Text & {
     return text;
 }
 
-auto Button::getDefColor() -> sf::Color & {
-    return defColor;
-}
+//auto Button::getDefColor() -> sf::Color & {
+//    return defColor;
+//}
 
 auto Button::setDefColor(const sf::Color &defColor) -> void {
     this->defColor = defColor;
 }
 
-auto Button::setPosition(const sf::Vector2f &pos, float width, float height) -> void {
-    button.setPosition(pos);
+//auto Button::setPosition(const sf::Vector2f &pos, float width, float height) -> void {
+//    button.setPosition(pos);
+//
+//    auto xPos = (pos.x + button.getGlobalBounds().width / width) - (text.getGlobalBounds().width / width);
+//    auto yPos = (pos.y + button.getGlobalBounds().height / height) - (text.getGlobalBounds().height / height);
+//
+//    text.setPosition(xPos, yPos);
+//}
 
-    auto xPos = (pos.x + button.getGlobalBounds().width / width) - (text.getGlobalBounds().width / width);
-    auto yPos = (pos.y + button.getGlobalBounds().height / height) - (text.getGlobalBounds().height / height);
-
-    text.setPosition(xPos, yPos);
-}
-
-auto Button::drawBut(sf::RenderWindow &window) -> void {
+auto Button::drawBut(sf::RenderWindow &window) const -> void {
     window.draw(button);
     window.draw(text);
 }
@@ -85,7 +84,16 @@ auto Button::centralizeText() -> void {
     text.setPosition(xCenter, yCenter);
 }
 
-//auto Button::colorButtonGame(sf::Color &color) -> void {
-//    text.setFillColor(color);
-//    button.setOutlineColor(color);
-//}
+auto Button::getTextString() -> std::basic_string<char> {
+    return text.getString().toAnsiString();
+}
+
+auto Button::color(const sf::Color &color) -> void {
+    text.setFillColor(color);
+    button.setOutlineColor(color);
+}
+
+auto Button::colorDefault() -> void {
+    text.setFillColor(defColor);
+    button.setOutlineColor(defColor);
+}

@@ -2,6 +2,8 @@
 
 #include <SFML/Graphics.hpp>
 
+using std::string;
+
 class Button {
 public:
     /**
@@ -13,14 +15,16 @@ public:
      * @param pos
      * @param font
      */
-    Button(const std::string &text, const float &radius, const int &charSize, const sf::Color &back,
+    Button(const string &text, const float &radius, const int &charSize, const sf::Color &back,
            const sf::Vector2f &pos, const sf::Font &font, int angles);
 
     Button();
 
     auto getText() -> sf::Text &;
 
-    auto getDefColor() -> sf::Color &;
+    auto getTextString() -> std::basic_string<char>;
+
+//    auto getDefColor() -> sf::Color &;
 
     auto setDefColor(const sf::Color &defColor) -> void;
 
@@ -31,7 +35,7 @@ public:
      * @param height for position adjustment by height
      * @return void
      */
-    auto setPosition(const sf::Vector2f &pos, float width, float height) -> void;
+//    auto setPosition(const sf::Vector2f &pos, float width, float height) -> void;
 
     /**
      * Function for centralizing text of a button.
@@ -44,7 +48,7 @@ public:
      * @param window
      * @return void
      */
-    auto drawBut(sf::RenderWindow &window) -> void;
+    auto drawBut(sf::RenderWindow &window) const -> void;
 
     /**
      * Detect whether mouse is over specific button.
@@ -60,7 +64,16 @@ public:
      */
     auto colorButMenu(sf::RenderWindow &window) -> void;
 
+    /**
+     * Function for coloring button in provided color.
+     * @param color
+     */
+    auto color(const sf::Color &color) -> void;
 
+    /**
+     * Function for coloring button in its default color.
+     */
+    auto colorDefault() -> void;
 private:
     sf::CircleShape button;
     sf::Text text;

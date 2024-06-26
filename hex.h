@@ -1,19 +1,41 @@
+#include <memory>
 #include "button.h"
+#include <vector>
+
+using std::vector, std::unique_ptr;
 
 class Hex {
 private:
     int q, r, s;
-    Button button;
+    unique_ptr<Button> button;
 public:
-    int getQ() const;
+    auto getQ() const -> int;
 
-    int getR() const;
+    auto getR() const -> int;
 
-    int getS() const;
+    auto getS() const -> int;
 
-    const Button &getButton() const;
+    auto getButton() const -> const unique_ptr<Button> &;
 
-    Hex(int q, int r, int s, Button button);
+    Hex(int q, int r, int s, unique_ptr<Button> &btn);
 
-    int getDistance(const Hex &other) const;
+//    Hex(int q, int r, int s);
+
+    /**
+     * Function which calculates and returns distance between two cells.
+     * @param other
+     * @return int
+     */
+    auto getDistance(const unique_ptr<Hex> &other) const -> int;
+
+    /**
+     * Function for adding two cells.
+     * @param offset
+     * @return
+     */
+    auto add(vector<int> offset) const -> vector<int>;
+
+//    vector<vector<int>> getOffsets() const;
+
+//    static const vector<vector<int>> directions;
 };

@@ -2,6 +2,7 @@
 
 #include "button.h"
 #include "gamestate.h"
+#include "hex.h"
 #include <vector>
 #include <memory>
 #include <sstream>
@@ -35,7 +36,7 @@ public:
     * @param turn
     * @param timer
     */
-    Game(const std::vector<std::vector<int>> &mapInt, bool mode, bool turn, const sf::Time &timer);
+    Game(const vector<vector<int>> &mapInt, bool mode, bool turn, const sf::Time &timer);
 
     auto getTimer() -> sf::Time &;
 
@@ -59,13 +60,13 @@ public:
     * @param window
     * @return void
     */
-    auto makeMove(sf::RenderWindow &window) -> void;
+    auto colorGameButtons(sf::RenderWindow &window) -> void;
 
     /**
     * Function which simply checks whether game is ended or not.
     * @return bool
     */
-    auto checkEnd() -> bool;
+    auto isEnd() -> bool;
 
     /**
     * Auxiliary function which defines whether there is selected pawn.
@@ -88,7 +89,7 @@ public:
     * @param x
     * @return void
     */
-    auto checkMove(int y, int x) -> void;
+    auto makeMove(int y, int x) -> void;
 
     /**
     * Function which colors specific free places where pawn can move.
@@ -103,7 +104,7 @@ public:
     * @param ch (choice for counting specific objects)
     * @return std::string
     */
-    auto counter(int ch) -> std::string;
+    auto counter(int ch) -> string;
 
     /**
     * Function defined for computer move choosing.
@@ -124,14 +125,47 @@ public:
     * Function defined for displaying high scores in the corresponding menu.
     * @return std::string
     */
-    static auto readFile() -> std::string;
+    static auto readFile() -> string;
 
     /**
-    * Function for coloring buttons their default color.
-    * @param ch
+    * Function for coloring buttons their default colorChange.
+    * @param colorChange
     * @return void
     */
-    auto disableColor(bool ch) -> void;
+    auto disableColor(const sf::Color& colorChange) -> pair<int, int>;
+
+    /**
+     * Function for getting all valid offsets to move.
+     * @param y
+     * @param x
+     * @param range
+     * @return
+     */
+    auto getValidPositions(int y, int x, int range) -> vector<pair<int, int>>;
+
+    /**
+     * Function for finding cell by q, r, s parameters represented as a vector.
+     * @param coordinates
+     * @return
+     */
+    auto find(vector<int> coordinates) -> pair<int, int>;
+
+    /**
+     * Function for defining possibility to move on particular cell.
+     * @param y1
+     * @param x1
+     * @param y2
+     * @param x2
+     * @return
+     */
+    auto canMove(int y1, int x1, int y2, int x2) -> int;
+
+    /**
+     * Functions for finding offsets with enemies.
+     * @param selected
+     * @return
+     */
+    auto findEnemies(pair<int, int> selected) -> vector<pair<int, int>>;
 
     /**
     * Function for saving current game into text file. Game can be loaded in the future in the corresponding menu.
@@ -144,50 +178,37 @@ public:
     * @param path
     * @return Game
     */
-    static auto loadGame(const std::string &path) -> Game;
+    static auto loadGame(const string &path) -> Game;
 
     /**
     * Auxiliary function defined for fast buttons loading from the "savings" folder.
     * @param font
     * @return
     */
-    static auto loadGameBut(const sf::Font &font) -> std::vector<std::unique_ptr<Button>>;
+    static auto loadGameBut(const sf::Font &font) -> vector<unique_ptr<Button>>;
 
 private:
-    std::vector<std::vector<int>> mapInt = {{3},
-                                            {1, 1},
-                                            {1, 1, 1},
-                                            {1, 1, 1, 1},
-                                            {2, 1, 1, 1, 2},
-                                            {1, 1, 1, 1},
-                                            {1, 1, 0, 1, 1},
-                                            {1, 1, 1, 1},
-                                            {1, 1, 1, 1, 1},
-                                            {1, 0, 0, 1},
-                                            {1, 1, 1, 1, 1},
-                                            {1, 1, 1, 1},
-                                            {3, 1, 1, 1, 3},
-                                            {1, 1, 1, 1},
-                                            {1, 1, 1},
-                                            {1, 1},
-                                            {2}
-    };
-
-    std::vector<std::vector<int>> offsetEnemy = {
-            {-2, 0},
-            {-1, -1},
-            {-1, 0},
-            {-1, 1},
-            {0,  -1},
-            {1,  -1},
-            {0,  1},
-            {1,  0},
-            {1,  1},
-            {2,  0}
+    vector<vector<int>> mapInt = {{3},
+                                  {1, 1},
+                                  {1, 1, 1},
+                                  {1, 1, 1, 1},
+                                  {2, 1, 1, 1, 2},
+                                  {1, 1, 1, 1},
+                                  {1, 1, 0, 1, 1},
+                                  {1, 1, 1, 1},
+                                  {1, 1, 1, 1, 1},
+                                  {1, 0, 0, 1},
+                                  {1, 1, 1, 1, 1},
+                                  {1, 1, 1, 1},
+                                  {3, 1, 1, 1, 3},
+                                  {1, 1, 1, 1},
+                                  {1, 1, 1},
+                                  {1, 1},
+                                  {2}
     };
 
     sf::Time timer = sf::seconds(0);
     bool mode{};
     bool turn{};
-    std::vector<std::vector<std::unique_ptr<Button>>> mapBut;
+    vector<vector<unique_ptr<Hex>>> mapHex;
 };

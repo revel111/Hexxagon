@@ -10,8 +10,14 @@ class Menu {
 public:
     Menu(int width, int height);
 
+    /**
+     * Function for rendering window.
+     */
     auto render() -> void;
 
+    /**
+     * Function for rendering events.
+     */
     auto renderEvent(sf::Event event) -> void;
 
     auto renderState() -> void;
