@@ -3,6 +3,7 @@
 #include "button.h"
 #include "gamestate.h"
 #include "hex.h"
+#include "Coords.h"
 #include <vector>
 #include <memory>
 #include <sstream>
@@ -47,6 +48,11 @@ public:
     * @return void
     */
     auto initializeMap(sf::RenderWindow &window, const sf::Font &font) -> void;
+    /**
+     * Function for creating all coordinates for the game
+     * @return std::deque<Coords>
+     */
+    auto initializeCoordinates() -> std::deque<Coords>;
 
     /**
     * Function for just usual map drawing, after first drawing.
@@ -132,7 +138,7 @@ public:
     * @param colorChange
     * @return void
     */
-    auto disableColor(const sf::Color& colorChange) -> pair<int, int>;
+    auto disableColor(const sf::Color &colorChange) -> pair<int, int>;
 
     /**
      * Function for getting all valid offsets to move.
@@ -190,19 +196,19 @@ public:
 private:
     vector<vector<int>> mapInt = {{3},
                                   {1, 1},
-                                  {1, 1, 1},
-                                  {1, 1, 1, 1},
-                                  {2, 1, 1, 1, 2},
-                                  {1, 1, 1, 1},
-                                  {1, 1, 0, 1, 1},
+                                  {1, 2, 1},
                                   {1, 1, 1, 1},
                                   {1, 1, 1, 1, 1},
-                                  {1, 0, 0, 1},
+                                  {1, 1, 1, 1},
+                                  {1, 1, 1, 1, 1},
+                                  {1, 1, 2, 1},
+                                  {1, 1, 1, 1, 1},
+                                  {1, 3, 1, 1},
                                   {1, 1, 1, 1, 1},
                                   {1, 1, 1, 1},
-                                  {3, 1, 1, 1, 3},
+                                  {1, 1, 1, 1, 1},
                                   {1, 1, 1, 1},
-                                  {1, 1, 1},
+                                  {1, 3, 1},
                                   {1, 1},
                                   {2}
     };

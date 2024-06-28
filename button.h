@@ -24,18 +24,7 @@ public:
 
     auto getTextString() -> std::basic_string<char>;
 
-//    auto getDefColor() -> sf::Color &;
-
     auto setDefColor(const sf::Color &defColor) -> void;
-
-    /**
-     * Function for position setting.
-     * @param pos
-     * @param width for position adjustment by width
-     * @param height for position adjustment by height
-     * @return void
-     */
-//    auto setPosition(const sf::Vector2f &pos, float width, float height) -> void;
 
     /**
      * Function for centralizing text of a button.

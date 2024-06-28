@@ -15,6 +15,8 @@ Button::Button(const std::string &text, const float &radius, const int &charSize
 
     if (angles == 4)
         button.setRotation(45);
+    else
+        button.setRotation(90);
 
     centralizeText();
 }
@@ -25,22 +27,10 @@ auto Button::getText() -> sf::Text & {
     return text;
 }
 
-//auto Button::getDefColor() -> sf::Color & {
-//    return defColor;
-//}
 
 auto Button::setDefColor(const sf::Color &defColor) -> void {
     this->defColor = defColor;
 }
-
-//auto Button::setPosition(const sf::Vector2f &pos, float width, float height) -> void {
-//    button.setPosition(pos);
-//
-//    auto xPos = (pos.x + button.getGlobalBounds().width / width) - (text.getGlobalBounds().width / width);
-//    auto yPos = (pos.y + button.getGlobalBounds().height / height) - (text.getGlobalBounds().height / height);
-//
-//    text.setPosition(xPos, yPos);
-//}
 
 auto Button::drawBut(sf::RenderWindow &window) const -> void {
     window.draw(button);
@@ -48,19 +38,10 @@ auto Button::drawBut(sf::RenderWindow &window) const -> void {
 }
 
 auto Button::isMouseOver(sf::RenderWindow &window) -> bool {
-    auto xMouse = sf::Mouse::getPosition(window).x;
-    auto yMouse = sf::Mouse::getPosition(window).y;
+    auto mousePosWindow = sf::Mouse::getPosition(window);
+    auto mousePosView = window.mapPixelToCoords(mousePosWindow);
 
-    auto xButPos = button.getPosition().x;
-    auto yButPos = button.getPosition().y;
-
-    auto butXPosWid = button.getPosition().x + button.getLocalBounds().width;
-    auto butYPosHei = button.getPosition().y + button.getLocalBounds().height;
-
-    if (xMouse < butXPosWid && xMouse > xButPos && yMouse < butYPosHei && yMouse > yButPos)
-        return true;
-
-    return false;
+    return button.getGlobalBounds().contains(mousePosView);
 }
 
 auto Button::colorButMenu(sf::RenderWindow &window) -> void {

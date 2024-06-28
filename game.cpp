@@ -19,42 +19,28 @@ auto Game::getTimer() -> sf::Time & {
 }
 
 auto Game::initializeMap(sf::RenderWindow &window, const sf::Font &font) -> void {
-    mapHex.resize(mapInt.size());
-    int maxColumns = 0;
+    int numRows = mapInt.size();
 
-    for (const auto &row: mapInt)
-        if (row.size() > maxColumns)
-            maxColumns = row.size();
+    mapHex.resize(numRows);
+    for (int i = 0; i < numRows; ++i)
+        mapHex[i].resize(mapInt[i].size());
 
-    float buttonRadius = 30.0f;
-    float buttonSpacingX = buttonRadius * 1.75f;
-    float buttonSpacingY = buttonRadius * 1.48f;
+    auto hexSize = 30.0f;
+    auto coords = initializeCoordinates();
 
-    float startX = (1200 - buttonSpacingX * maxColumns) / 2;
-    float startY = (800 - buttonSpacingY * (mapInt.size() + 0.5)) / 2;
+    for (int rowIndex = 0; rowIndex < numRows; ++rowIndex) {
+        for (int colIndex = 0; colIndex < mapInt[rowIndex].size(); ++colIndex) {
 
-    int N = mapInt.size() / 2;
+            auto coord = coords.front();
+            float posX = window.getSize().x / 2.0f - 25.f + hexSize * 1.5f * coord.getR();
+            float posY = window.getSize().y / 2.0f - 30.f +
+                         hexSize * std::sqrt(3.0f) * (coord.getQ() + coord.getR() * 0.5f);
 
-    for (int q = -N; q <= N; ++q) {
-        int r1 = std::max(-N, -q - N);
-        int r2 = std::min(N, -q + N);
-        for (int r = r1; r <= r2; ++r) {
-
-            int rowIndex = r + N;
-            if (rowIndex < 0 || rowIndex >= mapInt.size()) continue;
-
-            int colIndex = q + (mapInt[rowIndex].size() - 1) / 2;
-            if (colIndex < 0 || colIndex >= mapInt[rowIndex].size()) continue;
-
-            float currentStartX = startX + (buttonSpacingX / 2) * (maxColumns - mapInt[rowIndex].size());
-            float posX = currentStartX + colIndex * buttonSpacingX;
-            float posY = startY + rowIndex * buttonSpacingY;
 
             sf::Vector2f pos{posX, posY};
-            auto button = std::make_unique<Button>("", buttonRadius, 10, sf::Color::Black, pos, font, 6);
+            auto button = std::make_unique<Button>("", hexSize, 10, sf::Color::Black, pos, font, 6);
 
             int mapValue = mapInt[rowIndex][colIndex];
-
             switch (mapValue) {
                 case 0:
                     button->getText().setString("X");
@@ -76,13 +62,28 @@ auto Game::initializeMap(sf::RenderWindow &window, const sf::Font &font) -> void
 
             button->colorDefault();
 
-            if (mapHex[rowIndex].size() <= colIndex)
-                mapHex[rowIndex].resize(colIndex + 1);
 
-            mapHex[rowIndex][colIndex] = std::make_unique<Hex>(q, r, -q - r, button);
-            mapHex[rowIndex][colIndex]->getButton()->drawBut(window);
+            mapHex[rowIndex][colIndex] = std::make_unique<Hex>(coord.getQ(), coord.getR(), coord.getS(), button);
+            coords.erase(coords.begin());
         }
     }
+}
+
+auto Game::initializeCoordinates() -> std::deque<Coords> {
+    int N = 4;
+    auto coords = std::deque<Coords>();
+
+    for (int q = -N; q <= N; q++) {
+        int r1 = std::max(-N, -q - N);
+        int r2 = std::min(N, -q + N);
+
+        for (int r = r1; r <= r2; r++) {
+            auto s = -q - r;
+            coords.emplace_back(q, r, s);
+        }
+    }
+
+    return coords;
 }
 
 auto Game::drawMap(sf::RenderWindow &window) -> void {
@@ -101,15 +102,15 @@ auto Game::isEnd() -> bool {
     if (counter(1) == "0" || counter(2) == "0" || counter(3) == "0")
         return true;
 
-//    for (auto y = 0; y < mapHex.size(); y++)
-//        for (auto x = 0; x < mapHex[y].size(); x++)
-//            if (mapHex[y][x]->getButton()->getTextString() == "1" ||
-//                mapHex[y][x]->getButton()->getTextString() == "2")
-//                for (auto position: getValidPositions(y, x, 2))
-//                    if (mapHex[position.first][position.second]->getButton()->getTextString() == "O")
-//                        return false;
+    for (auto y = 0; y < mapHex.size(); y++)
+        for (auto x = 0; x < mapHex[y].size(); x++)
+            if (mapHex[y][x]->getButton()->getTextString() == "1" ||
+                mapHex[y][x]->getButton()->getTextString() == "2")
+                for (auto position: getValidPositions(y, x, 2))
+                    if (mapHex[position.first][position.second]->getButton()->getTextString() == "O")
+                        return false;
 
-    return false;
+    return true;
 }
 
 auto Game::checkSelected() -> bool {
@@ -147,12 +148,8 @@ auto Game::colorButGame(sf::RenderWindow &window, int y, int x) -> void {
 auto Game::makeMove(int y, int x) -> void {
     auto selected = disableColor(sf::Color::Green);
 
-    if (/*canMove(selected.first, selected.second, y, x) &&*/
-            mapHex[y][x]->getButton()->getText().getFillColor() == sf::Color::Yellow) {
-//        auto validMoves = getValidPositions(selected.first, selected.second, 1);
-//        auto validMoves = getValidPositions(selectedY, selectedX);
-
-        for (auto position: findEnemies(selected))
+    if (mapHex[y][x]->getButton()->getText().getFillColor() == sf::Color::Yellow) {
+        for (auto position: findEnemies({y, x}))
             if (mapHex[position.first][position.second]->getButton()->getTextString() == "2" && !turn) {
                 mapHex[position.first][position.second]->getButton()->getText().setString("1");
                 mapHex[position.first][position.second]->getButton()->setDefColor(sf::Color::Blue);
@@ -187,9 +184,6 @@ auto Game::makeMove(int y, int x) -> void {
 }
 
 auto Game::colorPossible(int y, int x) -> void {
-//    auto validMoves = getValidPositions(y, x, 2);
-//    auto validMoves = getValidPositions(y, x);
-
     for (auto pair: getValidPositions(y, x, 2))
         if (mapHex[pair.first][pair.second]->getButton()->getTextString() == "O")
             mapHex[pair.first][pair.second]->getButton()->color(sf::Color::Yellow);
@@ -241,6 +235,7 @@ auto Game::aiMakeMove() -> void {
                                  });
 
     mapHex[best->first.first.first][best->first.first.second]->getButton()->color(sf::Color::Green);
+    colorPossible(best->first.first.first, best->first.first.second);
     makeMove(best->first.second.first, best->first.second.second);
 }
 
@@ -405,18 +400,6 @@ auto Game::loadGameBut(const sf::Font &font) -> vector<unique_ptr<Button>> {
     return newVector;
 }
 
-//auto Game::getValidPositions(int y, int x) -> vector<pair<int, int>> {
-//    auto validMoves = vector<pair<int, int>>();
-//
-//    for (auto i = 0; i < mapHex.size(); i++)
-//        for (auto j = 0; j < mapHex[i].size(); j++)
-//            if (canMove(i, j, y, x))
-//                validMoves.emplace_back(i, j);
-//
-//    return validMoves;
-//}
-
-//auto Game::find(int q, int r, int s) -> pair<int, int> {
 auto Game::find(vector<int> coordinates) -> pair<int, int> {
     for (int i = 0; i < mapHex.size(); i++)
         for (int j = 0; j < mapHex[i].size(); j++)
@@ -433,25 +416,16 @@ auto Game::getValidPositions(int y, int x, int range) -> vector<pair<int, int>> 
 
     for (int q = -range; q <= range; q++)
         for (int r = std::max(-range, -q - range); r <= std::min(range, -q + range); r++) {
-            auto pair = find(mapHex[y][x]->add({q, r, -q - r}));
+            auto pair = find(mapHex[y][x]->add(q, r, -q - r));
 
             if (pair.first != -1 && pair.second != -1)
                 validMoves.push_back(pair);
         }
 
-//    for (int i = 0; i < mapHex.size(); i++)
-//        for (int j = 0; j < mapHex[i].size(); j++) {
-//            auto distance = canMove(y, x, i, j);
-//            if ((range == 2 && (distance == 1 || distance == 2)) ||
-//                (range == 1 && distance == 1))
-//                validMoves.emplace_back(i, j);
-//        }
-
     return validMoves;
 }
 
 auto Game::canMove(int y1, int x1, int y2, int x2) -> int {
-//    auto distance = mapHex[y1][x1]->getDistance(mapHex[y2][x2]);
     return mapHex[y1][x1]->getDistance(mapHex[y2][x2]);
 }
 
